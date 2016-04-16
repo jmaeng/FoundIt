@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.jmaeng.found_it">
+
+    <!--
+
+    Your app must declare all components in this file :
+    activities, services, broadcast receivers, and content providers
+    by using tags:
+
+        <activity> for activities
+        <service> for services
+        <receiver> for broadcast receivers -> can declare in code instead using BroadCastReceiver object and registerReceiver()
+        <provider> for content providers
+
+    Things this manifest file does:
+    1) Declare user permissions here
+    2) Declare hardware and software features used or required by the app,
+            such as a camera, bluetooth services, or a multitouch screen.
+    3) Contains the API libraries the app needs to be linked against
+            (other than the Android framework APIs), such as the Google Maps library.
+    -->
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <!-- intent filter allows us to set implicit intent calls to this activity.
+                    Therefore, this activity will auto take action when another app starts a MAIN intent
+                    - Declares capability of activity
+                    -->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+    </application>
+
+</manifest>
