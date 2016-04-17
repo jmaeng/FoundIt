@@ -25,7 +25,7 @@ public class MainDB {
     private static final String ENTRY_NAME = "name";
     private static final int COL_NAME_INDEX = 1;
 
-    //TODO need to add a room table here and connect the rooms table to the room table
+    //TODO need to add a items table here and connect the items table to the room table
 
     //Using SQL to create table
     private static final String CREATE_ROOMS_TABLE =
