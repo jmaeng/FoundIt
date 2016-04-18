@@ -14,7 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 public class MainActivity extends AppCompatActivity
@@ -48,8 +51,34 @@ public class MainActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //set image carousel
+        //TODO need to change this to an array that is dynamic with our database of item images
+        Integer images[] = {R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery};
+        for (Integer image: images) {
+            addImagestoImageCarousel(image);
+        }
+        //if called from another activity
+        Intent intent = getIntent(); //TODO Do I do anything with this though? Is this necessary?
 
     }
+
+    /*
+    Adds images to the image carousel
+     */
+   private void addImagestoImageCarousel(Integer image) {
+       LinearLayout imageCarousel = (LinearLayout)findViewById(R.id.image_carousel);
+       ImageView myImage = new ImageView(this);
+       myImage.setImageResource(image);
+       myImage.setLayoutParams(new AbsListView.LayoutParams(
+               AbsListView.LayoutParams.MATCH_PARENT,
+               AbsListView.LayoutParams.WRAP_CONTENT));
+       imageCarousel.addView(myImage);
+    }
+
     /*
     Helps save the state of the UI. Do not use to store persistent data (data that is saved to database),
      use onPause() for that instead for that.
@@ -101,7 +130,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            return true; //TODO
         } else if (id == R.id.action_search) {
             return true;
             //TODO
@@ -117,12 +146,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         Intent intent;
 
-        if (id == R.id.nav_all_rooms) {
-            intent = new Intent(this, AllRoomsActivity.class);
-        } else if (id == R.id.nav_all_items) {
-           //TODO
+        if (id == R.id.nav_home) {
+            //TODO do nothing? Or go to home again?
 
+        } else if (id == R.id.nav_all_rooms) {
+            intent = new Intent(this, AllRoomsActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_all_items) {
+                //TODO
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

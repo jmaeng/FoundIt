@@ -44,6 +44,10 @@
         <activity
             android:name=".AllRoomsActivity"
             android:label="@string/title_activity_all_room"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CreateRoom"
+            android:label="@string/title_activity_create_room"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

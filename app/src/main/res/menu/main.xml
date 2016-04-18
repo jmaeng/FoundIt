@@ -13,7 +13,7 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_36dp"
-        android:title="search for an item"
+        android:title="@string/search"
         app:showAsAction="always|collapseActionView"
         app:actionViewClass = "android.widget.SearchView"/>
 </menu>

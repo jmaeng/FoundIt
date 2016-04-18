@@ -14,14 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class AllRoomsActivity extends AppCompatActivity
+public class CreateRoom extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_rooms);
+        setContentView(R.layout.activity_create_room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -42,8 +41,6 @@ public class AllRoomsActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Intent intent = getIntent();
     }
 
     @Override
@@ -59,7 +56,7 @@ public class AllRoomsActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.all_rooms, menu);
+        getMenuInflater().inflate(R.menu.create_room, menu);
         return true;
     }
 
@@ -90,9 +87,13 @@ public class AllRoomsActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_all_rooms) {
-            //TODO do nothing?
+            intent = new Intent(this, AllRoomsActivity.class);
+            startActivity(intent);
+
         } else if (id == R.id.nav_all_items) {
+
             //TODO
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

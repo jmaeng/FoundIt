@@ -15,6 +15,9 @@ import android.database.sqlite.SQLiteOpenHelper;
  * the database directly.
  *
  */
+
+//TODO INCOMPLETE CLASS
+    
 public class MainDB {
 
     private static final String DB_NAME = "main.db";
@@ -23,13 +26,14 @@ public class MainDB {
     private static final String ENTRY_ID = "_id";
 
     private static final String ENTRY_NAME = "name";
-    private static final int COL_NAME_INDEX = 1;
+    private static final String ENTRY_IMAGE = "image";
 
     //TODO need to add a items table here and connect the items table to the room table
 
     //Using SQL to create table
     private static final String CREATE_ROOMS_TABLE =
-            "CREATE TABLE" + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY," + ENTRY_NAME + " TEXT) ;";
+            "CREATE TABLE" + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY,"
+                    + ENTRY_NAME + " TEXT, " + ENTRY_IMAGE + " BLOB" + ") ;";
 
     private static final String DROP_ROOMS_TABLE = "DROP TABLE IF EXISTS " + ROOMS_TABLE;
 
