@@ -13,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 public class AllRoomsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,6 +47,31 @@ public class AllRoomsActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Intent intent = getIntent();
+
+        //set image carousel
+        //TODO need to change this to an array that is dynamic with our database of room images
+        Integer images[] = {R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
+                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery};
+
+        for (Integer image: images) {
+            addImagestoImageCarousel(image);
+        }
+    }
+
+    /*
+    Adds images to the image carousel
+     */
+    private void addImagestoImageCarousel(Integer image) {
+        LinearLayout imageCarousel = (LinearLayout)findViewById(R.id.image_carousel);
+        ImageView myImage = new ImageView(this);
+        myImage.setImageResource(image);
+        myImage.setLayoutParams(new AbsListView.LayoutParams(
+                AbsListView.LayoutParams.MATCH_PARENT,
+                AbsListView.LayoutParams.WRAP_CONTENT));
+        imageCarousel.addView(myImage);
     }
 
     @Override

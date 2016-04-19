@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity
                 R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
                 R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
                 R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery};
+
         for (Integer image: images) {
             addImagestoImageCarousel(image);
         }
@@ -156,7 +157,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_all_items) {
                 //TODO
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
