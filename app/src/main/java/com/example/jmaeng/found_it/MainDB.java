@@ -1,8 +1,12 @@
 package com.example.jmaeng.found_it;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 
 /**
  * Created by Jmaeng on 4/16/2016.
@@ -14,40 +18,76 @@ import android.database.sqlite.SQLiteOpenHelper;
  * This class will server as the outter protective class for the database, so nothing interacts with
  * the database directly.
  *
+ * Also, this is a singleton class because I want all activities to share the same DB
+ *
  */
 
 //TODO INCOMPLETE CLASS
     
 public class MainDB {
 
-    private static final String DB_NAME = "main.db";
+    private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
     private static final int DB_VERSION = 1;
     private static final String ROOMS_TABLE = "rooms_table";
     private static final String ENTRY_ID = "_id";
 
     private static final String ENTRY_NAME = "name";
-    private static final String ENTRY_IMAGE = "image";
+    private static final String ROOM_FACE = "room_face";
+    private static final String VIEW_COUNT ="view_count";
+    private static final String DATE_CREATED ="date_created";
+    private static final String LAST_ACCESSED = "last_accessed";
+    private static final String ENTRY_IMAGE = "entry_image";
 
-    //TODO need to add a items table here and connect the items table to the room table
-
-    //Using SQL to create table
+    //Using SQL to create tables
+     /*
+    ROOM TABLE
+    RoomFace - key -- each wall of them room
+    RoomName -- actual name
+    Image
+    View Count - popular
+    Created -- recently added
+    Last Accessed -- most recently view
+     */
     private static final String CREATE_ROOMS_TABLE =
-            "CREATE TABLE" + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY,"
-                    + ENTRY_NAME + " TEXT, " + ENTRY_IMAGE + " BLOB" + ") ;";
+            "CREATE TABLE IF NOT EXISTS " + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY, "
+                    + ENTRY_NAME + " TEXT, " + ROOM_FACE + " INTEGER, " + VIEW_COUNT + " INTEGER, "
+                    + DATE_CREATED + " TEXT, " + LAST_ACCESSED + " TEXT, " + ENTRY_IMAGE + " BLOB"
+                    + ") ;";
+
+    /*
+    ITEM TABLE
+    Name
+    Description
+    Last Accessed
+    Created
+    View Count
+    InRoom -- what room it lives in -- room Face
+    RoomX - X coord on room face
+    RoomY - Y coord
+    Picture
+     */
+    //TODO need to create ITEMS table
 
     private static final String DROP_ROOMS_TABLE = "DROP TABLE IF EXISTS " + ROOMS_TABLE;
 
     /*Inner class that obtains references to database and performs long-running operations of
     * creating and updating the database only when needed and NOT during app startup
+    *
+        Helper Class that contains all the methods to perform database operations like
+        opening a connection, closing connection, insert, update, read, delete, etc.
+
     */
     private static class DBHelper extends SQLiteOpenHelper {
 
+        private Context mContext;
+
         public DBHelper(Context context) {
             super(context, DB_NAME, null, DB_VERSION);
+            mContext = context;
         }
 
         @Override
-        /* Called when database is created for the first time */
+        /* Called when database is created for the first time and if database doesn't already exist */
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_ROOMS_TABLE);
         }
@@ -55,32 +95,70 @@ public class MainDB {
         @Override
         /* Called when database needs to be updgraded */
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL(DROP_ROOMS_TABLE);
-            onCreate(db); //TODO is this what we want? To drop the table onUpgrade?
+            db.execSQL(DROP_ROOMS_TABLE); // will only drop the table if it already exists
+            onCreate(db); //will create new updated table
         }
     }
 
 
     private DBHelper dbHelper;
-    private SQLiteDatabase mainDB;
+    private SQLiteDatabase sqlDB;
 
-    public MainDB(Context context) {
+    // Singleton object of this class
+    private static MainDB mainDBInstance;
+
+    private MainDB(Context context) {
         dbHelper = new DBHelper(context);
-        mainDB = null;
+        sqlDB = null;
     }
 
-    // sets up the main db as a readable db
+    public static synchronized MainDB getInstance(Context context) {
+        if (mainDBInstance == null) {
+            mainDBInstance = new MainDB(context);
+        }
+        return mainDBInstance;
+    }
+    // sets up the sqlDB as a readable DB
     protected void openReadableDB() {
-        mainDB = dbHelper.getReadableDatabase();
+        sqlDB = dbHelper.getReadableDatabase();
     }
 
-    // sets up the main db as a writable db
+    // sets up the sqlDB as a writable DB
     protected void openWritableDB() {
-        mainDB = dbHelper.getWritableDatabase();
+        sqlDB = dbHelper.getWritableDatabase();
+    }
+
+    //TODO writes to DB through helper when needed
+    public void writeToDB(){
+        openWritableDB();
+        //TODO
+        closeDB();
     }
 
     protected void closeDB() {
-        if (mainDB != null)
-            mainDB.close();
+        if (sqlDB != null)
+            sqlDB.close();
+    }
+
+    //TODO for testing
+    public ArrayList<byte[]> getAllImages() {
+        openReadableDB();
+        String[] cols = {ENTRY_IMAGE};
+        Cursor c = sqlDB.query(ROOMS_TABLE, cols, null, null, null, null, null, null);
+        ArrayList<byte[]> imageArray = new ArrayList<byte[]>();
+        int COL_IMAGE_INDEX = c.getColumnIndex(ENTRY_IMAGE);
+        c.moveToFirst();
+        for (int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(COL_IMAGE_INDEX)) {
+                byte[] bytes = c.getBlob(COL_IMAGE_INDEX);
+                //TODO this is not working need to figure out how to save pictures of high quality
+                //by saving the picture into internal storage and saving the path of the picture in the DB -- if need be.
+                imageArray.add(bytes);
+            }
+            c.moveToNext();
+        }
+        c.close();
+        closeDB();
+        return imageArray;
     }
 }

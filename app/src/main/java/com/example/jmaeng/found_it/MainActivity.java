@@ -1,6 +1,9 @@
 package com.example.jmaeng.found_it;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,10 +23,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private NavigationView navigationView;
+    private MainDB mainDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,29 +57,33 @@ public class MainActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //set image carousel
-        //TODO need to change this to an array that is dynamic with our database of item images
-        Integer images[] = {R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
-                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
-                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
-                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery,
-                R.drawable.ic_menu_gallery, R.drawable.ic_menu_gallery};
+        //this intent is used if called from another activity
+        Intent intent = getIntent(); //TODO Do I do anything with this though? Is this necessary?
 
-        for (Integer image: images) {
+        mainDatabase = MainDB.getInstance(getApplicationContext());
+
+        //set image carousel
+        //FOR TESTING TODO need to test to see if my test DB works, by putting all of the images in one carousel
+        /*
+        Query for all the images and put them in the images array I already created.
+        TODO Also this should all be in a AsyncTask or something in the real thing
+         */
+        ArrayList<byte[]> imageArray = mainDatabase.getAllImages();
+
+        for (byte[] image: imageArray) {
             addImagestoImageCarousel(image);
         }
-        //if called from another activity
-        Intent intent = getIntent(); //TODO Do I do anything with this though? Is this necessary?
 
     }
 
     /*
     Adds images to the image carousel
      */
-   private void addImagestoImageCarousel(Integer image) {
+   private void addImagestoImageCarousel(byte[] image) {
        LinearLayout imageCarousel = (LinearLayout)findViewById(R.id.image_carousel);
        ImageView myImage = new ImageView(this);
-       myImage.setImageResource(image);
+       myImage.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
+       //myImage.setImageResource(image);
        myImage.setLayoutParams(new AbsListView.LayoutParams(
                AbsListView.LayoutParams.MATCH_PARENT,
                AbsListView.LayoutParams.WRAP_CONTENT));
@@ -161,5 +171,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mainDatabase.closeDB();
     }
 }
