@@ -29,6 +29,7 @@ public class MainDB {
     private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
     private static final int DB_VERSION = 1;
     private static final String ROOMS_TABLE = "rooms_table";
+    private static final String ROOM_FACES_TABLE = "room_faces_table";
     private static final String ENTRY_ID = "_id";
 
     private static final String ENTRY_NAME = "name";
@@ -40,20 +41,28 @@ public class MainDB {
 
     //Using SQL to create tables
      /*
-    ROOM TABLE
-    RoomFace - key -- each wall of them room
-    RoomName -- actual name
-    Image
-    View Count - popular
-    Created -- recently added
-    Last Accessed -- most recently view
+    ROOMS TABLE -- will keep track of all the rooms individually -- each name and key should be unique
+    name -- name of the room
+    view_count - popular
+    date_created -- recently added
+    last_accessed -- most recently viewed
+    entry_image -- thumbnail image of the room
      */
     private static final String CREATE_ROOMS_TABLE =
             "CREATE TABLE IF NOT EXISTS " + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY, "
-                    + ENTRY_NAME + " TEXT, " + ROOM_FACE + " INTEGER, " + VIEW_COUNT + " INTEGER, "
-                    + DATE_CREATED + " TEXT, " + LAST_ACCESSED + " TEXT, " + ENTRY_IMAGE + " BLOB"
-                    + ") ;";
+                    + ENTRY_NAME + " TEXT, " + VIEW_COUNT + " INTEGER, " + DATE_CREATED + " TEXT, "
+                    + LAST_ACCESSED + " TEXT, " + ENTRY_IMAGE + " BLOB" + ") ;";
 
+    /*
+    ROOM_FACES_TABLE -- will keep track of all the walls in the room
+    name -- name of the room the face/wall belongs to
+    room_face -- numerical value of the room wall
+    entry_image -- actual image of the room wall
+     */
+    private static final String CREATE_ROOM_FACES_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + ROOM_FACES_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY, "
+                    + ENTRY_NAME + " TEXT, " + ROOM_FACE + " INTEGER, " + ENTRY_IMAGE + " BLOB"
+                    + ") ;";
     /*
     ITEM TABLE
     Name
@@ -69,6 +78,7 @@ public class MainDB {
     //TODO need to create ITEMS table
 
     private static final String DROP_ROOMS_TABLE = "DROP TABLE IF EXISTS " + ROOMS_TABLE;
+    private static final String DROP_ROOM_FACES_TABLE = "DROP TABLE IF EXISTS " + ROOM_FACES_TABLE;
 
     /*Inner class that obtains references to database and performs long-running operations of
     * creating and updating the database only when needed and NOT during app startup
@@ -90,17 +100,18 @@ public class MainDB {
         /* Called when database is created for the first time and if database doesn't already exist */
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_ROOMS_TABLE);
+            db.execSQL(CREATE_ROOM_FACES_TABLE);
         }
 
         @Override
         /* Called when database needs to be updgraded */
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             db.execSQL(DROP_ROOMS_TABLE); // will only drop the table if it already exists
+            db.execSQL(DROP_ROOM_FACES_TABLE);
             onCreate(db); //will create new updated table
         }
     }
-
-
+    
     private DBHelper dbHelper;
     private SQLiteDatabase sqlDB;
 
@@ -140,16 +151,18 @@ public class MainDB {
             sqlDB.close();
     }
 
-    //TODO for testing
-    public ArrayList<byte[]> getAllImages() {
+    //Gets all images from the rooms_table, meaning every room paired with one image
+    public ArrayList<byte[]> getAllImagesWithName() {
         openReadableDB();
-        String[] cols = {ENTRY_IMAGE};
+        String[] cols = {ENTRY_NAME, ENTRY_IMAGE};
         Cursor c = sqlDB.query(ROOMS_TABLE, cols, null, null, null, null, null, null);
         ArrayList<byte[]> imageArray = new ArrayList<byte[]>();
+        int COL_NAME_INDEX = c.getColumnIndex(ENTRY_NAME);
         int COL_IMAGE_INDEX = c.getColumnIndex(ENTRY_IMAGE);
         c.moveToFirst();
         for (int i = 0; i < c.getCount(); i++) {
             if (!c.isNull(COL_IMAGE_INDEX)) {
+                String name = c.getString(COL_NAME_INDEX); //TODO need to add this somewhere
                 byte[] bytes = c.getBlob(COL_IMAGE_INDEX);
                 //TODO this is not working need to figure out how to save pictures of high quality
                 //by saving the picture into internal storage and saving the path of the picture in the DB -- if need be.
@@ -160,5 +173,29 @@ public class MainDB {
         c.close();
         closeDB();
         return imageArray;
+    }
+
+    public ArrayList<Room> getAllRooms(){
+        openReadableDB();
+        String[] cols = {ENTRY_NAME, ENTRY_IMAGE};
+        Cursor c = sqlDB.query(ROOMS_TABLE, cols, null, null, null, null, null, null);
+        ArrayList<Room> roomArray = new ArrayList<Room>();
+        int COL_NAME_INDEX = c.getColumnIndex(ENTRY_NAME);
+        int COL_IMAGE_INDEX = c.getColumnIndex(ENTRY_IMAGE);
+        c.moveToFirst();
+        for (int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(COL_IMAGE_INDEX)) {
+                String name = c.getString(COL_NAME_INDEX); //TODO need to add this somewhere
+                byte[] image = c.getBlob(COL_IMAGE_INDEX);
+                //TODO this is not working need to figure out how to save pictures of high quality
+                //by saving the picture into internal storage and saving the path of the picture in the DB -- if need be.
+                Room room = new Room(name, image);
+                roomArray.add(room);
+            }
+            c.moveToNext();
+        }
+        c.close();
+        closeDB();
+        return roomArray;
     }
 }

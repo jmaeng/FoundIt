@@ -1,9 +1,9 @@
 package com.example.jmaeng.found_it;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
@@ -63,27 +62,44 @@ public class MainActivity extends AppCompatActivity
         mainDatabase = MainDB.getInstance(getApplicationContext());
 
         //set image carousel
-        //FOR TESTING TODO need to test to see if my test DB works, by putting all of the images in one carousel
-        /*
-        Query for all the images and put them in the images array I already created.
-        TODO Also this should all be in a AsyncTask or something in the real thing
-         */
-        ArrayList<byte[]> imageArray = mainDatabase.getAllImages();
+        //FOR TESTING
+        (new DownloadFromDB()).execute(mainDatabase);
 
-        for (byte[] image: imageArray) {
-            addImagestoImageCarousel(image);
+    }
+
+    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<byte[]>> {
+
+        @Override
+        protected  ArrayList<byte[]> doInBackground(MainDB... params) {
+            MainDB db = params[0];
+            //Query for all the images and put them in the images array I already created.
+            return db.getAllImagesWithName();
         }
 
+        protected void onPostExecute(final ArrayList<byte[]> imageArray) {
+
+            for (byte[] image: imageArray) {
+                addImagestoImageCarousel(image, R.id.popular_image_carousel);
+                addImagestoImageCarousel(image, R.id.recently_added_image_carousel);
+                addImagestoImageCarousel(image, R.id.last_viewed_image_carousel);
+                addImagestoImageCarousel(image, R.id.all_image_carousel);
+            }
+        }
     }
 
     /*
     Adds images to the image carousel
      */
-   private void addImagestoImageCarousel(byte[] image) {
-       LinearLayout imageCarousel = (LinearLayout)findViewById(R.id.image_carousel);
+   private void addImagestoImageCarousel(byte[] image, int layoutID) {
+       LinearLayout imageCarousel = (LinearLayout)findViewById(layoutID);
        ImageView myImage = new ImageView(this);
-       myImage.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
-       //myImage.setImageResource(image);
+       Bitmap b = BitmapFactory.decodeByteArray(image, 0, image.length);
+       //rescale image
+       float aspectRatio = b.getWidth()/b.getHeight();
+       int width = 480;
+       int height = Math.round((width/aspectRatio));
+       //set the image
+       myImage.setImageBitmap(Bitmap.createScaledBitmap(b, width, height, false));
        myImage.setLayoutParams(new AbsListView.LayoutParams(
                AbsListView.LayoutParams.MATCH_PARENT,
                AbsListView.LayoutParams.WRAP_CONTENT));
