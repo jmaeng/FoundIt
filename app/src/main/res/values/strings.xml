@@ -15,4 +15,5 @@
 
     <!-- buttons -->
     <string name="create_room_button">Create Room</string>
+    <string name="title_activity_main_room">MainRoomActivity</string>
 </resources>

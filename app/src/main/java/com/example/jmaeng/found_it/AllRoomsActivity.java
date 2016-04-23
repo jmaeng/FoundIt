@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,12 +50,18 @@ public class AllRoomsActivity extends AppCompatActivity
         //Set up GridView
         gridView = (GridView)findViewById(R.id.gridView);
 
+        //get info from DB for this activity
+        mainDatabase = MainDB.getInstance(getApplicationContext());
+        (new DownloadFromDB()).execute(mainDatabase);
 
         //ClickListener for each grid (room thumbnail) in gridview TODO
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(AllRoomsActivity.this, "" + position, Toast.LENGTH_SHORT).show();
+                //TODO this should go straight in to the Room Info activity with an intent with a message
+                Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
+                intent.putExtra("roomName", roomArray.get(position).getName());
+                startActivity(intent);
             }
         });
 
@@ -64,7 +71,18 @@ public class AllRoomsActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show(); //TODO
+            }
+        });
+
+        //Set up Create Room Button
+        Button createRoomButton = (Button)findViewById(R.id.create_room_button);
+        createRoomButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Make This button do something bro", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                        //TODO waiting for create room activity with camera and photo upload functionality to be complete by Tyler
             }
         });
 
@@ -80,10 +98,6 @@ public class AllRoomsActivity extends AppCompatActivity
 
         //Obtain intents
         Intent intent = getIntent();
-
-        //get info from DB for this activity
-        mainDatabase = MainDB.getInstance(getApplicationContext());
-        (new DownloadFromDB()).execute(mainDatabase);
 
     }
 

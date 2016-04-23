@@ -27,6 +27,9 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //TODO java.lang.OutOfMemoryError: Failed to allocate a 921612 byte allocation with 761904 free bytes and 744KB until OOM
+    // TODO there is an out of memory error when trying to get to this activity multiple times, NEED TO FIX
+
     private NavigationView navigationView;
     private MainDB mainDatabase;
 

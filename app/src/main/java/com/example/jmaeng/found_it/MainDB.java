@@ -111,7 +111,7 @@ public class MainDB {
             onCreate(db); //will create new updated table
         }
     }
-    
+
     private DBHelper dbHelper;
     private SQLiteDatabase sqlDB;
 
