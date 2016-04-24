@@ -12,8 +12,9 @@
     <!-- Activity Screen Titles -->
     <string name="title_activity_all_room">All Rooms</string>
     <string name="title_activity_create_room">Create Room</string>
+    <string name="title_activity_main_room">Current Room</string>
 
     <!-- buttons -->
     <string name="create_room_button">Create Room</string>
-    <string name="title_activity_main_room">MainRoomActivity</string>
+
 </resources>

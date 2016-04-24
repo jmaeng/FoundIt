@@ -43,15 +43,12 @@ public class MainDB {
      /*
     ROOMS TABLE -- will keep track of all the rooms individually -- each name and key should be unique
     name -- name of the room
-    view_count - popular
-    date_created -- recently added
-    last_accessed -- most recently viewed
-    entry_image -- thumbnail image of the room
+    entry_image -- thumbnail image of the room -- will actually be image of a face we just chose at
+    random to represent the room
      */
     private static final String CREATE_ROOMS_TABLE =
             "CREATE TABLE IF NOT EXISTS " + ROOMS_TABLE + "(" + ENTRY_ID + " INTEGER PRIMARY KEY, "
-                    + ENTRY_NAME + " TEXT, " + VIEW_COUNT + " INTEGER, " + DATE_CREATED + " TEXT, "
-                    + LAST_ACCESSED + " TEXT, " + ENTRY_IMAGE + " BLOB" + ") ;";
+                    + ENTRY_NAME + " TEXT, " + ENTRY_IMAGE + " BLOB" + ") ;";
 
     /*
     ROOM_FACES_TABLE -- will keep track of all the walls in the room
@@ -197,5 +194,27 @@ public class MainDB {
         c.close();
         closeDB();
         return roomArray;
+    }
+
+    public ArrayList<RoomFace> getAllRoomFaces(String roomName) {
+        openReadableDB();
+        String[] cols = {ROOM_FACE, ENTRY_IMAGE};
+        ArrayList<RoomFace> roomFaceArray = new ArrayList<RoomFace>();
+        Cursor c = sqlDB.query(ROOM_FACES_TABLE, cols, ENTRY_NAME + " = " + "\'" + roomName + "\'", null, null, null, ROOM_FACE, null);
+        int COL_FACE_INDEX = c.getColumnIndex(ROOM_FACE);
+        int COL_IMAGE_INDEX = c.getColumnIndex(ENTRY_IMAGE);
+        c.moveToFirst();
+        for(int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(COL_IMAGE_INDEX)){
+                int roomFaceNum = c.getInt(COL_FACE_INDEX);
+                byte[] image = c.getBlob(COL_IMAGE_INDEX);
+                RoomFace roomFace = new RoomFace(roomFaceNum, image);
+                roomFaceArray.add(roomFace);
+            }
+            c.moveToNext();
+        }
+        c.close();
+        closeDB();
+        return roomFaceArray;
     }
 }

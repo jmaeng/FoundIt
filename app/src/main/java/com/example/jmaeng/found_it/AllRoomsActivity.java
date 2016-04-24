@@ -2,8 +2,6 @@ package com.example.jmaeng.found_it;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -19,15 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -48,7 +43,7 @@ public class AllRoomsActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //Set up GridView
-        gridView = (GridView)findViewById(R.id.gridView);
+        gridView = (GridView)findViewById(R.id.allRoomGridView);
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());

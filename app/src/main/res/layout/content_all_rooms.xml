@@ -15,7 +15,7 @@
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/gridView"
+        android:id="@+id/allRoomGridView"
         android:numColumns="auto_fit"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
@@ -32,9 +32,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true">
     </Button>
-
-    <!-- TODO Need to figure out listview and adaptors to get 3 separate image
-    carousels on here -->
 
 
 </RelativeLayout>
