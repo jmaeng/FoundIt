@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,6 +37,7 @@ public class AllRoomsActivity extends AppCompatActivity
     private GridView gridView;
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
+    private static final int COLS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +47,14 @@ public class AllRoomsActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //Set up GridView
-        gridView = (GridView)findViewById(R.id.allRoomGridView);
+        //gridView = (GridView)findViewById(R.id.allRoomGridView);
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(mainDatabase);
 
         //ClickListener for each grid (room thumbnail) in gridview TODO
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO this should go straight in to the Room Info activity with an intent with a message
@@ -58,7 +62,7 @@ public class AllRoomsActivity extends AppCompatActivity
                 intent.putExtra("roomName", roomArray.get(position).getName());
                 startActivity(intent);
             }
-        });
+        });*/
 
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -99,7 +103,7 @@ public class AllRoomsActivity extends AppCompatActivity
     /*
     ImageAdapter for all the images in the grid representing different rooms
      */
-    public class ImageAdapter extends BaseAdapter {
+/*    public class ImageAdapter extends BaseAdapter {
         private Context context;
 
         public ImageAdapter(Context c) {
@@ -128,7 +132,7 @@ public class AllRoomsActivity extends AppCompatActivity
 
             if (convertView == null) {
                 LayoutInflater li = getLayoutInflater();
-                view = li.inflate(R.layout.room_grid, null);
+                view = li.inflate(R.layout.room_view, null);
                 textView = (TextView)view.findViewById(R.id.room_name);
                 textView.setText(room.getName());
                 imageView = (ImageView)view.findViewById(R.id.room_image);
@@ -144,7 +148,7 @@ public class AllRoomsActivity extends AppCompatActivity
 
             return view;
         }
-    }
+    }*/
 
     /*
     AsyncTask class that will obtain info from the database about all the rooms and then set up the
@@ -162,10 +166,79 @@ public class AllRoomsActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<Room> rooms) {
             roomArray = rooms;
-            gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
+            //gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
+            //TODO How is this really saving us resources if we inflate recycler view continuously?
+            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view); //this is returning null and I don't know why...
+            GridLayoutManager glm = new GridLayoutManager(AllRoomsActivity.this, COLS);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(glm);
+            recyclerView.setAdapter(new RecyclerViewAdaptor());
         }
     }
 
+    //the Recycler Adaptor that will connect the room data to UI
+    public class RecyclerViewAdaptor extends RecyclerView.Adapter<RecyclerViewAdaptor.ViewHolder> {
+
+        public RecyclerViewAdaptor() {
+
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.room_view, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            final Room room = roomArray.get(position);
+            holder.getImageView().setImageBitmap(room.getBitmap());
+            holder.getNameView().setText(room.getName());
+
+            holder.getImageView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
+                    intent.putExtra("roomName", room.getName());
+                    startActivity(intent);
+                }
+
+            });
+        }
+
+        @Override
+        public int getItemCount(){
+            if(roomArray != null)
+                return roomArray.size();
+            return 0;
+        }
+
+
+        //setting up each view, which are inflated from room_view.xml
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            private final TextView roomName;
+            private final ImageView roomImage;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                roomName = (TextView) itemView.findViewById(R.id.room_name);
+                roomImage = (ImageView)itemView.findViewById(R.id.room_image);
+                itemView.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+                itemView.setPadding(PADDING, PADDING, PADDING, PADDING);
+
+            }
+
+            public ImageView getImageView() {
+                return roomImage;
+            }
+
+            public TextView getNameView(){
+                return roomName;
+            }
+
+        }
+    }
 
     @Override
     public void onBackPressed() {
