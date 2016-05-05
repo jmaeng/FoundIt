@@ -596,7 +596,7 @@ public class MainDB {
         String query = "SELECT " + FACE_NAME + ", " + FACE_IMG +
                 " FROM " + FACES_TABLE +
                 " WHERE " + FACE_ROOM + "=\'" + roomName + "\' " +
-                " ORDER BY " + ROOM_NAME + " COLLATE NOCASE ASC";
+                " ORDER BY " + FACE_NAME + " COLLATE NOCASE ASC";
         Cursor c = sqlDB.rawQuery(query, null);
 
         // Query returned empty
