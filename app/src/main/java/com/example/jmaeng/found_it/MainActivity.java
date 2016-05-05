@@ -44,10 +44,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        */
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 callAddItemActivity();
             }
         });
@@ -83,14 +80,14 @@ public class MainActivity extends AppCompatActivity
         }
 
         protected void onPostExecute(final ArrayList<Room> roomArray) {
-            byte[] image = null;
+            byte[] image;
 
             for (Room room: roomArray) {
                 image = room.getImage();
-                addImagesToImageCarousel(image, R.id.popular_image_carousel);
-                addImagesToImageCarousel(image, R.id.recently_added_image_carousel);
-                addImagesToImageCarousel(image, R.id.last_viewed_image_carousel);
-                addImagesToImageCarousel(image, R.id.all_image_carousel);
+                addImagestoImageCarousel(image, R.id.popular_image_carousel);
+                addImagestoImageCarousel(image, R.id.recently_added_image_carousel);
+                addImagestoImageCarousel(image, R.id.last_viewed_image_carousel);
+                addImagestoImageCarousel(image, R.id.all_image_carousel);
             }
         }
     }
@@ -98,7 +95,7 @@ public class MainActivity extends AppCompatActivity
     /*
     Adds images to the image carousel
      */
-   private void addImagesToImageCarousel(byte[] image, int layoutID) {
+   private void addImagestoImageCarousel(byte[] image, int layoutID) {
        LinearLayout imageCarousel = (LinearLayout)findViewById(layoutID);
        ImageView myImage = new ImageView(this);
        Bitmap b = BitmapFactory.decodeByteArray(image, 0, image.length);
@@ -117,7 +114,7 @@ public class MainActivity extends AppCompatActivity
     /*
     Helps save the state of the UI. Do not use to store persistent data (data that is saved to database),
      use onPause() for that instead for that.
-     Overriding in case we want to save additional information than the default
+     Overridding in case we want to save additional information than the default
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -203,11 +200,8 @@ public class MainActivity extends AppCompatActivity
         mainDatabase.closeDB();
     }
 
-
-    /**
-     *
-     */
-    public void callAddItemActivity() {
-        startActivity(new Intent(this, AddItemActivity.class));
+    private void callAddItemActivity() {
+        Intent intent = new Intent(this, AddItemActivity.class);
+        startActivity(intent);
     }
 }

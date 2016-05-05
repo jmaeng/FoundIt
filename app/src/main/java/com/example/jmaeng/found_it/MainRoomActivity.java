@@ -98,7 +98,7 @@ public class MainRoomActivity extends AppCompatActivity
         protected  ArrayList<RoomFace> doInBackground(MainDB... params) {
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
-            return db.getAllRoomFaces(roomName);
+            return db.getRoomFaceImages(roomName);
         }
 
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well

@@ -84,7 +84,6 @@ public class MainDB {
 
     /*
     FACES_TABLE  : Stores all room face information for specific rooms
-
     face_name    : Face/Wall for the associated image. Example: Kitchen_1, Kitchen_2, etc
     face_room    : Room name associated with the face. Example: Kitchen for Kitchen_1
     face_img     : Image for the room face
@@ -99,7 +98,6 @@ public class MainDB {
 
     /*
     ITEMS_TABLE          : Stores information for all items stored in the database
-
     item_name           : Name of the stored item (primary key)
     item_desc           : Description of the item
     item_last_accessed  : When the item was last accessed
@@ -326,6 +324,23 @@ public class MainDB {
         return room;
     }
 
+    /**
+     * Checks to see if a room exists in database.
+     * @param room_name Room to search for.
+     * @return True if item exists, otherwise false
+     */
+    public boolean checkRoomInDB(String room_name) {
+        openReadableDB();
+        String query = "SELECT " + ROOM_NAME +
+                " FROM " + ROOMS_TABLE +
+                " WHERE " + ROOM_NAME + "=\'" + room_name + "\'";
+        Cursor c = sqlDB.rawQuery(query, null);
+        int cnt = c.getCount();
+        c.close();
+        closeDB();
+        return cnt > 0;
+    }
+
 
     /**
      * Add the passed room face to the faces table.
@@ -424,6 +439,23 @@ public class MainDB {
         c.close();
         closeDB();
         return face;
+    }
+
+    /**
+     * Checks to see if a room face exists in database.
+     * @param face_name Room face to search for.
+     * @return True if item exists, otherwise false
+     */
+    public boolean checkFaceInDB(String face_name) {
+        openReadableDB();
+        String query = "SELECT " + FACE_NAME +
+                " FROM " + FACES_TABLE +
+                " WHERE " + FACE_NAME + "=\'" + face_name + "\'";
+        Cursor c = sqlDB.rawQuery(query, null);
+        int cnt = c.getCount();
+        c.close();
+        closeDB();
+        return cnt > 0;
     }
 
 
@@ -546,6 +578,58 @@ public class MainDB {
         return item;
     }
 
+    /**
+     * Checks to see if item exists in database.
+     * @param item_name Item to search for.
+     * @return True if item exists, otherwise false
+     */
+    public boolean checkItemInDB(String item_name) {
+        openReadableDB();
+        String query = "SELECT " + ITEM_NAME +
+                " FROM " + ITEMS_TABLE +
+                " WHERE " + ITEM_NAME + "=\'" + item_name + "\'";
+        Cursor c = sqlDB.rawQuery(query, null);
+        int cnt = c.getCount();
+        c.close();
+        closeDB();
+        return cnt > 0;
+    }
+
+
+
+    /**
+     * Get all room names in alphabetical order as an ArrayList
+     * @return ArrayList of all room names
+     */
+    public ArrayList<String> getAllRoomNames() {
+        openReadableDB();
+        ArrayList<String> nameArray = new ArrayList<String>();
+
+        // SQL Query Construction
+        String query = "SELECT " + ROOM_NAME +
+                " FROM " + ROOMS_TABLE +
+                " ORDER BY " + ROOM_NAME + " COLLATE NOCASE ASC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        // Query was empty
+        if(c == null) {
+            closeDB();
+            return null;
+        }
+
+        // Gather all rooms
+        c.moveToFirst();
+        for (int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(ROOM_NAME_INDEX)) {
+                nameArray.add(c.getString(ROOM_NAME_INDEX));
+            }
+            c.moveToNext();
+        }
+
+        c.close();
+        closeDB();
+        return nameArray;
+    }
 
     /**
      * Get all stored rooms as an ArrayList of Room objects.
@@ -619,6 +703,40 @@ public class MainDB {
         c.close();
         closeDB();
         return roomFaces;
+    }
+
+    /**
+     * Get all item names in alphabetical order as an ArrayList
+     * @return ArrayList of all item names
+     */
+    public ArrayList<String> getAllItemNames() {
+        openReadableDB();
+        ArrayList<String> nameArray = new ArrayList<String>();
+
+        // SQL Query Construction
+        String query = "SELECT " + ITEM_NAME +
+                " FROM " + ITEMS_TABLE +
+                " ORDER BY " + ITEM_NAME + " COLLATE NOCASE ASC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        // Query was empty
+        if(c == null) {
+            closeDB();
+            return null;
+        }
+
+        // Gather all rooms
+        c.moveToFirst();
+        for (int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(ITEM_NAME_INDEX)) {
+                nameArray.add(c.getString(ITEM_NAME_INDEX));
+            }
+            c.moveToNext();
+        }
+
+        c.close();
+        closeDB();
+        return nameArray;
     }
 
     /**
