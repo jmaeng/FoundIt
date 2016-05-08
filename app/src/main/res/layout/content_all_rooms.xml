@@ -12,18 +12,6 @@
     tools:context=".AllRoomsActivity"
     tools:showIn="@layout/app_bar_all_rooms">
 
-    <!-- <GridView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/allRoomGridView"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:gravity="center"
-        android:scrollbars="none">
-
-    </GridView> -->
-
     <android.support.v7.widget.RecyclerView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -122,7 +122,7 @@ public class MainDB {
 
     public static synchronized MainDB getInstance(Context context) {
         if (mainDBInstance == null) {
-            mainDBInstance = new MainDB(context);
+            mainDBInstance = new MainDB(context.getApplicationContext());
         }
         return mainDBInstance;
     }
@@ -184,8 +184,6 @@ public class MainDB {
             if (!c.isNull(COL_IMAGE_INDEX)) {
                 String name = c.getString(COL_NAME_INDEX); //TODO need to add this somewhere
                 byte[] image = c.getBlob(COL_IMAGE_INDEX);
-                //TODO this is not working need to figure out how to save pictures of high quality
-                //by saving the picture into internal storage and saving the path of the picture in the DB -- if need be.
                 Room room = new Room(name, image);
                 roomArray.add(room);
             }

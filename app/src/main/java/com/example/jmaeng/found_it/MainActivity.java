@@ -22,16 +22,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //TODO java.lang.OutOfMemoryError: Failed to allocate a 921612 byte allocation with 761904 free bytes and 744KB until OOM
-    // TODO there is an out of memory error when trying to get to this activity multiple times, NEED TO FIX
+    //TODO need to create an adaptor to handle the images and stop continual inflation of views
+    //need to create a ViewHolder to stop wasting time finding views
+    //need to make it a RecyclerView to force it to recycle views to make it go faster
+
 
     private NavigationView navigationView;
     private MainDB mainDatabase;
+    private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,47 +72,95 @@ public class MainActivity extends AppCompatActivity
 
         //set image carousel
         //FOR TESTING
-        (new DownloadFromDB()).execute(mainDatabase);
+
+        popCarouselTask = (new DownloadFromDB(R.id.popular_image_carousel));
+        /*recentCarouselTask = (new DownloadFromDB(R.id.recently_added_image_carousel));
+        lastViewCarouselTask = (new DownloadFromDB(R.id.last_viewed_image_carousel));*/
+        popCarouselTask.execute(mainDatabase);
+       /* recentCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);*/
 
     }
 
-    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<byte[]>> {
+    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Bitmap>> {
 
-        @Override
-        protected  ArrayList<byte[]> doInBackground(MainDB... params) {
-            MainDB db = params[0];
-            //Query for all the images and put them in the images array I already created.
-            return db.getAllImagesWithName();
+        private int layoutID;
+
+        public DownloadFromDB(int layoutID) {
+            this.layoutID = layoutID;
         }
 
-        protected void onPostExecute(final ArrayList<byte[]> imageArray) {
+        @Override
+        protected  ArrayList<Bitmap> doInBackground(MainDB... params) {
+            MainDB db = params[0];
+            //Query for all the images and put them in the images array I already created.
+            //TODO need to change this method to point to the items table
+            ArrayList<byte[]> imageArray = db.getAllImagesWithName();
+
+            ArrayList<Bitmap> bitmapArray = new ArrayList<Bitmap>();
+            Bitmap b, compressedBitmap;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            int width = 100, height = 100;
 
             for (byte[] image: imageArray) {
-                addImagestoImageCarousel(image, R.id.popular_image_carousel);
-                addImagestoImageCarousel(image, R.id.recently_added_image_carousel);
-                addImagestoImageCarousel(image, R.id.last_viewed_image_carousel);
-                addImagestoImageCarousel(image, R.id.all_image_carousel);
+                options.inJustDecodeBounds = true;
+                b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
+
+                options.inSampleSize = calculateInSampleSize(options, width, height);
+                options.inJustDecodeBounds = false;
+
+                compressedBitmap = BitmapFactory.decodeByteArray(image, 0, image.length, options);
+                bitmapArray.add(compressedBitmap);
             }
+            return bitmapArray;
+        }
+
+        protected void onPostExecute(final ArrayList<Bitmap> bitmapArray) {
+            addImagesToImageCarousel(bitmapArray, layoutID);
         }
     }
 
     /*
     Adds images to the image carousel
      */
-   private void addImagestoImageCarousel(byte[] image, int layoutID) {
+   private void addImagesToImageCarousel(ArrayList<Bitmap> bitmapArray, int layoutID) { //OOM error here
        LinearLayout imageCarousel = (LinearLayout)findViewById(layoutID);
-       ImageView myImage = new ImageView(this);
-       Bitmap b = BitmapFactory.decodeByteArray(image, 0, image.length);
-       //rescale image
-       float aspectRatio = b.getWidth()/b.getHeight();
-       int width = 480;
-       int height = Math.round((width/aspectRatio));
-       //set the image
-       myImage.setImageBitmap(Bitmap.createScaledBitmap(b, width, height, false));
-       myImage.setLayoutParams(new AbsListView.LayoutParams(
-               AbsListView.LayoutParams.MATCH_PARENT,
-               AbsListView.LayoutParams.WRAP_CONTENT));
-       imageCarousel.addView(myImage);
+       WeakReference<ImageView> imageViewWeakReference;
+       ImageView imageView;
+
+       for (Bitmap bitmap: bitmapArray) {
+           imageView = new ImageView(this);
+           imageViewWeakReference = new WeakReference<ImageView>(imageView);
+           if (imageViewWeakReference != null && bitmap != null) {
+               imageView = imageViewWeakReference.get();
+               float aspectRatio = bitmap.getWidth()/bitmap.getHeight();
+               if (imageView != null) {
+                   imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 480, Math.round((480 / aspectRatio)), false));
+                   imageCarousel.addView(imageView);
+               }
+           }
+       }
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     /*
@@ -192,6 +246,17 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /*
+    Cancel all AsyncTasks if activity is stopped
+     */
+    @Override
+    protected void onStop(){
+        super.onStop();
+        popCarouselTask.cancel(false);
+        recentCarouselTask.cancel(false);
+        lastViewCarouselTask.cancel(false);
+
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
