@@ -52,10 +52,6 @@
         <activity
             android:name=".MainRoomActivity"
             android:label="@string/title_activity_main_room"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".AddItemActivity"
-            android:label="@string/title_activity_add_item"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

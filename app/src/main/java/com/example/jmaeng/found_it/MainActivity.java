@@ -1,7 +1,5 @@
 package com.example.jmaeng.found_it;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,8 +44,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                callAddItemActivity();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
@@ -72,20 +70,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
+    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<byte[]>> {
 
         @Override
-        protected  ArrayList<Room> doInBackground(MainDB... params) {
+        protected  ArrayList<byte[]> doInBackground(MainDB... params) {
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
-            return db.getAllRoomImages();
+            return db.getAllImagesWithName();
         }
 
-        protected void onPostExecute(final ArrayList<Room> roomArray) {
-            byte[] image;
+        protected void onPostExecute(final ArrayList<byte[]> imageArray) {
 
-            for (Room room: roomArray) {
-                image = room.getImage();
+            for (byte[] image: imageArray) {
                 addImagestoImageCarousel(image, R.id.popular_image_carousel);
                 addImagestoImageCarousel(image, R.id.recently_added_image_carousel);
                 addImagestoImageCarousel(image, R.id.last_viewed_image_carousel);
@@ -140,14 +136,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        /*
-        getMenuInflater().inflate(R.menu.main, menu);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.menu_search);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        return true;
-*/
-
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -208,10 +196,5 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mainDatabase.closeDB();
-    }
-
-    private void callAddItemActivity() {
-        Intent intent = new Intent(this, AddItemActivity.class);
-        startActivity(intent);
     }
 }

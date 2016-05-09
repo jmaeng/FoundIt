@@ -16,14 +16,5 @@
 
     <!-- buttons -->
     <string name="create_room_button">Create Room</string>
-    <string name="title_activity_add_item">Create New Item</string>
-
-    <!-- Add Item Activity -->
-    <string name="item_name_title">Item Name</string>
-    <string name="item_created_title">Created On</string>
-    <string name="item_desc_title">Item Description</string>
-    <string name="item_room_title">Select A Room</string>
-    <string name="item_room_button">Select a room...</string>
-    <string name="item_create_item">Create Item</string>
 
 </resources>
