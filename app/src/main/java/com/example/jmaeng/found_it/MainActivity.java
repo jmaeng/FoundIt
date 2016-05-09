@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                callAddItemActivity();
             }
         });
 
@@ -70,18 +70,20 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<byte[]>> {
+    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
 
         @Override
-        protected  ArrayList<byte[]> doInBackground(MainDB... params) {
+        protected  ArrayList<Room> doInBackground(MainDB... params) {
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
-            return db.getAllImagesWithName();
+            return db.getAllRoomImages();
         }
 
-        protected void onPostExecute(final ArrayList<byte[]> imageArray) {
+        protected void onPostExecute(final ArrayList<Room> roomArray) {
+            byte[] image;
 
-            for (byte[] image: imageArray) {
+            for (Room room: roomArray) {
+                image = room.getImage();
                 addImagestoImageCarousel(image, R.id.popular_image_carousel);
                 addImagestoImageCarousel(image, R.id.recently_added_image_carousel);
                 addImagestoImageCarousel(image, R.id.last_viewed_image_carousel);
@@ -196,5 +198,10 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mainDatabase.closeDB();
+    }
+
+    private void callAddItemActivity() {
+        Intent intent = new Intent(this, AddItemActivity.class);
+        startActivity(intent);
     }
 }
