@@ -45,8 +45,9 @@ public class MainDB {
     private static final String FACE_ROOM = "face_room";
     private static final String FACE_IMG = "face_img";
     private static final int FACE_NAME_INDEX = 0;
-    private static final int FACE_ROOM_INDEX = 1;
-    private static final int FACE_IMG_INDEX = 2;
+    private static final int FACE_IMG_INDEX = 1;
+    private static final int FACE_ROOM_INDEX = 2;
+
 
     // Item Table Column Names
     private static final String ITEM_NAME = "item_name";
@@ -688,7 +689,7 @@ public class MainDB {
             closeDB();
             return null;
         }
-
+        
         // Gather all room faces
         c.moveToFirst();
         for(int i = 0; i < c.getCount(); i++) {

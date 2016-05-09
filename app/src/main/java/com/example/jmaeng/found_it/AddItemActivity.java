@@ -1,7 +1,6 @@
 package com.example.jmaeng.found_it;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
