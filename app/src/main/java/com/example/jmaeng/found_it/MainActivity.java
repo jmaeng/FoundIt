@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,14 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SearchView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -34,10 +33,14 @@ public class MainActivity extends AppCompatActivity
     //need to create a ViewHolder to stop wasting time finding views
     //need to make it a RecyclerView to force it to recycle views to make it go faster
 
-
+    private static final String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
     private MainDB mainDatabase;
     private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
+    private ArrayList<Item> itemArray;
+
+    private RecyclerView popCarouselRecView, recentCarouselRecView, lastCarouselRecView;
+    private LinearLayoutManager popLM, recentLM, lastLM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,35 +73,59 @@ public class MainActivity extends AppCompatActivity
 
         mainDatabase = MainDB.getInstance(getApplicationContext());
 
-        //set image carousel
-        //FOR TESTING
+        popCarouselRecView = (RecyclerView)findViewById(R.id.pop_recycler_carousel_view);
+        recentCarouselRecView = (RecyclerView)findViewById(R.id.added_recycler_carousel_view);
+        lastCarouselRecView = (RecyclerView)findViewById(R.id.viewed_recycler_carousel_view);
 
-        popCarouselTask = (new DownloadFromDB(R.id.popular_image_carousel));
-        /*recentCarouselTask = (new DownloadFromDB(R.id.recently_added_image_carousel));
-        lastViewCarouselTask = (new DownloadFromDB(R.id.last_viewed_image_carousel));*/
+        popLM = new LinearLayoutManager(MainActivity.this);
+        recentLM = new LinearLayoutManager(MainActivity.this);
+        lastLM = new LinearLayoutManager(MainActivity.this);
+
+        popLM.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recentLM.setOrientation(LinearLayoutManager.HORIZONTAL);
+        lastLM.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+        popCarouselRecView.setHasFixedSize(true);
+        recentCarouselRecView.setHasFixedSize(true);
+        lastCarouselRecView.setHasFixedSize(true);
+
+
+        popCarouselRecView.setLayoutManager(popLM);
+        recentCarouselRecView.setLayoutManager(recentLM);
+        lastCarouselRecView.setLayoutManager(lastLM);
+
+        //TESTING
+        popCarouselTask = new DownloadFromDB();
+        recentCarouselTask =  new DownloadFromDB();
+        lastViewCarouselTask = new DownloadFromDB();
+
         popCarouselTask.execute(mainDatabase);
-       /* recentCarouselTask.execute(mainDatabase);
-        lastViewCarouselTask.execute(mainDatabase);*/
+        recentCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);
 
     }
 
-    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Bitmap>> {
+    private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Item>> {
 
-        private int layoutID;
+        private int recyclerViewID;
 
-        public DownloadFromDB(int layoutID) {
-            this.layoutID = layoutID;
+        public DownloadFromDB() {
+
+        }
+
+        public DownloadFromDB(int recyclerViewID) {
+            this.recyclerViewID = recyclerViewID;
         }
 
         @Override
-        protected  ArrayList<Bitmap> doInBackground(MainDB... params) {
+        protected  ArrayList<Item> doInBackground(MainDB... params) {
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
             //TODO need to change this method to point to the items table
             ArrayList<byte[]> imageArray = db.getAllImagesWithName();
 
             ArrayList<Bitmap> bitmapArray = new ArrayList<Bitmap>();
-            Bitmap b, compressedBitmap;
+            Bitmap b;
             BitmapFactory.Options options = new BitmapFactory.Options();
             int width = 100, height = 100;
 
@@ -109,37 +136,73 @@ public class MainActivity extends AppCompatActivity
                 options.inSampleSize = calculateInSampleSize(options, width, height);
                 options.inJustDecodeBounds = false;
 
-                compressedBitmap = BitmapFactory.decodeByteArray(image, 0, image.length, options);
-                bitmapArray.add(compressedBitmap);
+                b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
+                bitmapArray.add(b);
             }
-            return bitmapArray;
+
+            ArrayList<Item> itArray = new ArrayList<Item>(); //TODO make more efficient
+            for (Bitmap bit: bitmapArray) {
+                itemArray.add(new Item(bit));
+            }
+
+            return itArray;
         }
 
-        protected void onPostExecute(final ArrayList<Bitmap> bitmapArray) {
-            addImagesToImageCarousel(bitmapArray, layoutID);
+        protected void onPostExecute(final ArrayList<Item> itArray) {
+            itemArray = itArray;
+
+            popCarouselRecView.setAdapter(new CarouselViewAdaptor());
+            recentCarouselRecView.setAdapter(new CarouselViewAdaptor());
+            lastCarouselRecView.setAdapter(new CarouselViewAdaptor());
+
         }
     }
 
-    /*
-    Adds images to the image carousel
-     */
-   private void addImagesToImageCarousel(ArrayList<Bitmap> bitmapArray, int layoutID) { //OOM error here
-       LinearLayout imageCarousel = (LinearLayout)findViewById(layoutID);
-       WeakReference<ImageView> imageViewWeakReference;
-       ImageView imageView;
+    public class CarouselViewAdaptor extends RecyclerView.Adapter<CarouselViewAdaptor.ViewHolder> {
 
-       for (Bitmap bitmap: bitmapArray) {
-           imageView = new ImageView(this);
-           imageViewWeakReference = new WeakReference<ImageView>(imageView);
-           if (imageViewWeakReference != null && bitmap != null) {
-               imageView = imageViewWeakReference.get();
-               float aspectRatio = bitmap.getWidth()/bitmap.getHeight();
-               if (imageView != null) {
-                   imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 480, Math.round((480 / aspectRatio)), false));
-                   imageCarousel.addView(imageView);
-               }
-           }
-       }
+        public CarouselViewAdaptor(){
+
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.carousel_image_view, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            final Item item = itemArray.get(position);
+            holder.getImageView().setImageBitmap(item.getBitmap());
+
+            //onclick listener goes here too.
+        }
+
+        @Override
+        public int getItemCount() {
+           if (itemArray != null)
+                return itemArray.size();
+            return 0;
+        }
+
+        public void swap(ArrayList<Item> itArray) {
+            itemArray.clear();
+            itemArray.addAll(itArray);
+            notifyDataSetChanged();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+           private final ImageView itemImage;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                itemImage = (ImageView)itemView.findViewById(R.id.carousel_image);
+            }
+
+            public ImageView getImageView() { return itemImage; }
+
+        }
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -255,6 +318,20 @@ public class MainActivity extends AppCompatActivity
         popCarouselTask.cancel(false);
         recentCarouselTask.cancel(false);
         lastViewCarouselTask.cancel(false);
+
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        //TODO have to requery the database to change all the carousels
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //TODO have to requery the database to change all the carousels.
 
     }
     @Override
