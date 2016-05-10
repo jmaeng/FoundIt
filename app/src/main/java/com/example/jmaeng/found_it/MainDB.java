@@ -49,6 +49,7 @@ public class MainDB {
     private static final int FACE_ROOM_INDEX = 2;
 
 
+
     // Item Table Column Names
     private static final String ITEM_NAME = "item_name";
     private static final String ITEM_DESC = "item_desc";
@@ -604,7 +605,7 @@ public class MainDB {
      */
     public ArrayList<String> getAllRoomNames() {
         openReadableDB();
-        ArrayList<String> nameArray = new ArrayList<String>();
+        ArrayList<String> nameArray = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + ROOM_NAME +
@@ -638,7 +639,7 @@ public class MainDB {
      */
     public ArrayList<Room> getAllRoomImages() {
         openReadableDB();
-        ArrayList<Room> roomArray = new ArrayList<Room>();
+        ArrayList<Room> roomArray = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + ROOM_NAME + ", " + ROOM_IMG +
@@ -675,7 +676,7 @@ public class MainDB {
      */
     public ArrayList<RoomFace> getRoomFaceImages(String roomName) {
         openReadableDB();
-        ArrayList<RoomFace> roomFaces = new ArrayList<RoomFace>();
+        ArrayList<RoomFace> roomFaces = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + FACE_NAME + ", " + FACE_IMG +
@@ -712,7 +713,7 @@ public class MainDB {
      */
     public ArrayList<String> getAllItemNames() {
         openReadableDB();
-        ArrayList<String> nameArray = new ArrayList<String>();
+        ArrayList<String> nameArray = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + ITEM_NAME +
@@ -746,7 +747,7 @@ public class MainDB {
      */
     public ArrayList<Item> getAllItemImages(){
         openReadableDB();
-        ArrayList<Item> itemArray = new ArrayList<Item>();
+        ArrayList<Item> itemArray = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + ITEM_NAME + ", " + ITEM_IMG +
@@ -786,7 +787,7 @@ public class MainDB {
      */
     public ArrayList<Item> getRoomFaceItemPins(String roomFace){
         openReadableDB();
-        ArrayList<Item> itemArray = new ArrayList<Item>();
+        ArrayList<Item> itemArray = new ArrayList<>();
 
         // SQL Query Construction
         String query = "SELECT " + ITEM_NAME + ", " + ITEM_X +", " + ITEM_Y +", " + ITEM_IMG +
