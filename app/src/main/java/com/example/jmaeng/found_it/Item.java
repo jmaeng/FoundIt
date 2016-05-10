@@ -143,10 +143,10 @@ public class Item {
     }
 
     public void setBitmap(Bitmap b){
-        ITEM_BITMAP = b;
         //TODO This is causing errors, but might need to scale bitmap, so fix later when create room activity is ready
-       /* float aspectRatio = b.getWidth() / b.getHeight();
+        /*float aspectRatio = b.getWidth() / b.getHeight();
         ITEM_BITMAP = Bitmap.createScaledBitmap(b, 480, Math.round((480 / aspectRatio)), false);*/
+        ITEM_BITMAP = b;
     }
 
     public Bitmap getBitmap() {

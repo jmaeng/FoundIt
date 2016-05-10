@@ -31,11 +31,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int CAROUSAL_LIMIT = 8;
+    private static final int CAROUSEL_LIMIT = 8;
     private NavigationView navigationView;
     private MainDB mainDatabase;
     private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
-    private ArrayList<Item> itemArray;
+    //private ArrayList<Item> itemArray;
 
     private RecyclerView popCarouselRecView, recentCarouselRecView, lastCarouselRecView;
     private LinearLayoutManager popLM, recentLM, lastLM;
@@ -75,13 +75,9 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView = (RecyclerView)findViewById(R.id.added_recycler_carousel_view);
         lastCarouselRecView = (RecyclerView)findViewById(R.id.viewed_recycler_carousel_view);
 
-        popLM = new LinearLayoutManager(MainActivity.this);
-        recentLM = new LinearLayoutManager(MainActivity.this);
-        lastLM = new LinearLayoutManager(MainActivity.this);
-
-        popLM.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recentLM.setOrientation(LinearLayoutManager.HORIZONTAL);
-        lastLM.setOrientation(LinearLayoutManager.HORIZONTAL);
+        popLM = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        recentLM = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        lastLM = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
 
         popCarouselRecView.setHasFixedSize(true);
         recentCarouselRecView.setHasFixedSize(true);
@@ -92,9 +88,9 @@ public class MainActivity extends AppCompatActivity
         lastCarouselRecView.setLayoutManager(lastLM);
 
         //TESTING
-        popCarouselTask = new DownloadFromDB();
-        recentCarouselTask =  new DownloadFromDB();
-        lastViewCarouselTask = new DownloadFromDB();
+        popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
+        recentCarouselTask =  new DownloadFromDB(R.id.added_recycler_carousel_view);
+        lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
         popCarouselTask.execute(mainDatabase);
         recentCarouselTask.execute(mainDatabase);
@@ -106,10 +102,6 @@ public class MainActivity extends AppCompatActivity
 
         private int recyclerViewID;
 
-        public DownloadFromDB() {
-
-        }
-
         public DownloadFromDB(int recyclerViewID) {
             this.recyclerViewID = recyclerViewID;
         }
@@ -117,16 +109,22 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected  ArrayList<Item> doInBackground(MainDB... params) {
             MainDB db = params[0];
-            ArrayList<Item> itArray = db.getAllItemImages();
-            Log.d(TAG, "itArray size = " + itArray.size());
+            ArrayList<Item> itArray;
+            if (recyclerViewID == R.id.pop_recycler_carousel_view) {
+                itArray = db.getMostPopularItemImages();
+            } else if (recyclerViewID == R.id.added_recycler_carousel_view){
+                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+            } else {
+                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+            }
 
             Bitmap b;
             BitmapFactory.Options options = new BitmapFactory.Options();
-            int width = 50, height = 50;
+            int width = 100, height = 100;
 
-            for (int i = 0; i < CAROUSAL_LIMIT; i++) {
+            for (int i = 0; i < itArray.size() && i < CAROUSEL_LIMIT; i++) {
                 Item item = itArray.get(i);
-                byte[] image = item.get_ITEM_IMG(); //TODO having issues with conversion: SkImageDecoder::Factory returned null
+                byte[] image = item.get_ITEM_IMG();
                 options.inJustDecodeBounds = true;
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
@@ -141,20 +139,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         protected void onPostExecute(final ArrayList<Item> itArray) {
-            itemArray = itArray;
-
-            Log.d(TAG, "in onPostExecute");
-            popCarouselRecView.setAdapter(new CarouselViewAdaptor());
-            recentCarouselRecView.setAdapter(new CarouselViewAdaptor());
-            lastCarouselRecView.setAdapter(new CarouselViewAdaptor());
-
+            if (recyclerViewID == R.id.pop_recycler_carousel_view) {
+                popCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
+            } else if (recyclerViewID == R.id.viewed_recycler_carousel_view){
+                recentCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
+            } else {
+                lastCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
+            }
         }
     }
 
     public class CarouselViewAdaptor extends RecyclerView.Adapter<CarouselViewAdaptor.ViewHolder> {
 
-        public CarouselViewAdaptor(){
+        private ArrayList<Item> itemArray;
 
+        public CarouselViewAdaptor(ArrayList<Item> itArray){
+            itemArray = itArray;
         }
 
         @Override
@@ -279,7 +279,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
