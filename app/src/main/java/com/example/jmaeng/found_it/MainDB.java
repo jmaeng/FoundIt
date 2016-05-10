@@ -39,7 +39,6 @@ public class MainDB {
     private static final int ROOM_NAME_INDEX = 0;
     private static final int ROOM_IMG_INDEX = 1;
 
-
     // Face Column Names
     private static final String FACE_NAME = "face_name";
     private static final String FACE_ROOM = "face_room";
