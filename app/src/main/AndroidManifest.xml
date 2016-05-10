@@ -53,17 +53,13 @@
         <activity
             android:name=".MainRoomActivity"
             android:label="@string/title_activity_main_room"
-<<<<<<< HEAD
+
             android:theme="@style/AppTheme.NoActionBar"
             android:largeHeap="true"></activity>
-
-=======
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddItemActivity"
             android:label="@string/title_activity_add_item"
             android:theme="@style/AppTheme.NoActionBar"></activity>
->>>>>>> dbbc5ac557f5fcb6903cd4b117fa2294076283b3
     </application>
 
 </manifest>
