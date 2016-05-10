@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 
             for (int i = 0; i < CAROUSAL_LIMIT; i++) {
                 Item item = itArray.get(i);
-                byte[] image = item.get_ITEM_IMG(); //TODO having issues with conversion
+                byte[] image = item.get_ITEM_IMG(); //TODO having issues with conversion: SkImageDecoder::Factory returned null
                 options.inJustDecodeBounds = true;
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
 

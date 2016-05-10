@@ -342,8 +342,8 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
         if (c != null) {
             roomExists = c.getCount() > 0;
+            c.close();
         }
-        c.close();
         closeDB();
         return roomExists;
 
@@ -466,8 +466,9 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
         if (c != null) {
             faceExists = (c.getCount() > 0);
+            c.close();
         }
-        c.close();
+
         closeDB();
         return faceExists;
     }
@@ -616,8 +617,9 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
         if (c != null) {
             itemExists = (c.getCount() > 0);
+            c.close();
         }
-        c.close();
+
         closeDB();
         return itemExists;
     }
