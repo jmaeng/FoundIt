@@ -1,5 +1,8 @@
 package com.example.jmaeng.found_it;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 
 public class Item {
     /*
@@ -24,6 +27,7 @@ public class Item {
     private int ITEM_X;
     private int ITEM_Y;
     private byte[] ITEM_IMG;
+    private Bitmap ITEM_BITMAP;
 
 
     /**
@@ -136,5 +140,16 @@ public class Item {
 
     public byte[] get_ITEM_IMG() {
         return this.ITEM_IMG;
+    }
+
+    public void setBitmap(Bitmap b){
+        ITEM_BITMAP = b;
+        //TODO This is causing errors, but might need to scale bitmap, so fix later when create room activity is ready
+       /* float aspectRatio = b.getWidth() / b.getHeight();
+        ITEM_BITMAP = Bitmap.createScaledBitmap(b, 480, Math.round((480 / aspectRatio)), false);*/
+    }
+
+    public Bitmap getBitmap() {
+        return ITEM_BITMAP;
     }
 }
