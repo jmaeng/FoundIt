@@ -26,6 +26,8 @@ import java.util.ArrayList;
 public class MainDB {
 
     private static final String TAG = MainDB.class.getSimpleName();
+    private static final int CAROUSEL_LIMIT = 8;
+
     // Database
     private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
     private static final int DB_VERSION = 1;
@@ -770,7 +772,6 @@ public class MainDB {
      * @return ArrayList of Item with all item names and images stored, all other values are null.
      */
     public ArrayList<Item> getAllItemImages(){  //DO NOT MODIFY THIS METHOD -JM
-        Log.d(TAG, "inside getAllItemImages");
         openReadableDB();
         ArrayList<Item> itemArray = new ArrayList<Item>();
 
@@ -783,7 +784,6 @@ public class MainDB {
         //Query returned results
         if(c != null) {
             // Gather all item images
-            Log.d(TAG, "cursor found something, " + c.getCount());
             Item toAdd;
             c.moveToFirst();
             for (int i = 0; i < c.getCount(); i++) {
@@ -792,7 +792,7 @@ public class MainDB {
                 int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
-                    byte[] image = c.getBlob(ITEM_NAME_INDEX);
+                    byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
                     toAdd.set_ITEM_NAME(name);
                     toAdd.set_ITEM_IMG(image);
                     itemArray.add(toAdd);
@@ -803,6 +803,43 @@ public class MainDB {
         }
         closeDB();
         return itemArray;
+    }
+
+    public ArrayList<Item> getMostPopularItemImages() { //DO NOT MODIFY -JM
+        openReadableDB();
+        ArrayList<Item> mostPopItemArray = new ArrayList<Item>();
+
+        // SQL Query Construction
+        String query = "SELECT " + ITEM_NAME + ", " + ITEM_VIEW_CNT + ", " + ITEM_IMG +
+                " FROM " + ITEMS_TABLE +
+                " ORDER BY " + ITEM_VIEW_CNT + " COLLATE NOCASE DESC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        //Query returned results
+        if(c != null) {
+            // Gather the top 8 most popular items
+            Item toAdd;
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount() && i < CAROUSEL_LIMIT; i++) {
+                toAdd = new Item();
+                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+                int ITEM_CNT_INDEX = c.getColumnIndex(ITEM_VIEW_CNT);
+                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
+                if (!c.isNull(ITEM_IMAGE_INDEX)) {
+                    String name = c.getString(ITEM_NAME_INDEX);
+                    byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    int viewCount = Integer.parseInt(c.getString(ITEM_CNT_INDEX));
+                    toAdd.set_ITEM_NAME(name);
+                    toAdd.set_ITEM_IMG(image);
+                    toAdd.set_ITEM_VIEW_CNT(viewCount);
+                    mostPopItemArray.add(toAdd);
+                }
+                c.moveToNext();
+            }
+            c.close();
+        }
+        closeDB();
+        return mostPopItemArray;
     }
 
     /**
