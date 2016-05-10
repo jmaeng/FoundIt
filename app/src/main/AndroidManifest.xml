@@ -53,7 +53,6 @@
         <activity
             android:name=".MainRoomActivity"
             android:label="@string/title_activity_main_room"
-
             android:theme="@style/AppTheme.NoActionBar"
             android:largeHeap="true"></activity>
         <activity

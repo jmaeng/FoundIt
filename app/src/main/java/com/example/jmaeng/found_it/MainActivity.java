@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -29,11 +30,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //TODO need to create an adaptor to handle the images and stop continual inflation of views
-    //need to create a ViewHolder to stop wasting time finding views
-    //need to make it a RecyclerView to force it to recycle views to make it go faster
-
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int CAROUSAL_LIMIT = 8;
     private NavigationView navigationView;
     private MainDB mainDatabase;
     private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
@@ -89,7 +87,6 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView.setHasFixedSize(true);
         lastCarouselRecView.setHasFixedSize(true);
 
-
         popCarouselRecView.setLayoutManager(popLM);
         recentCarouselRecView.setLayoutManager(recentLM);
         lastCarouselRecView.setLayoutManager(lastLM);
@@ -120,16 +117,16 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected  ArrayList<Item> doInBackground(MainDB... params) {
             MainDB db = params[0];
-            //Query for all the images and put them in the images array I already created.
-            //TODO need to change this method to point to the items table
             ArrayList<Item> itArray = db.getAllItemImages();
+            Log.d(TAG, "itArray size = " + itArray.size());
 
             Bitmap b;
             BitmapFactory.Options options = new BitmapFactory.Options();
-            int width = 100, height = 100;
+            int width = 50, height = 50;
 
-            for (Item i: itemArray) {
-                byte[] image = i.get_ITEM_IMG();
+            for (int i = 0; i < CAROUSAL_LIMIT; i++) {
+                Item item = itArray.get(i);
+                byte[] image = item.get_ITEM_IMG(); //TODO having issues with conversion
                 options.inJustDecodeBounds = true;
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
@@ -137,7 +134,7 @@ public class MainActivity extends AppCompatActivity
                 options.inJustDecodeBounds = false;
 
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
-                i.setBitmap(b);
+                item.setBitmap(b);
             }
 
             return itArray;
@@ -146,6 +143,7 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(final ArrayList<Item> itArray) {
             itemArray = itArray;
 
+            Log.d(TAG, "in onPostExecute");
             popCarouselRecView.setAdapter(new CarouselViewAdaptor());
             recentCarouselRecView.setAdapter(new CarouselViewAdaptor());
             lastCarouselRecView.setAdapter(new CarouselViewAdaptor());
@@ -180,11 +178,11 @@ public class MainActivity extends AppCompatActivity
             return 0;
         }
 
-        public void swap(ArrayList<Item> itArray) {
+        /*public void swap(ArrayList<Item> itArray) {
             itemArray.clear();
             itemArray.addAll(itArray);
             notifyDataSetChanged();
-        }
+        }*/
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
