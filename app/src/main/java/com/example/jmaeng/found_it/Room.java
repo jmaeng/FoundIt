@@ -15,10 +15,20 @@ public class Room {
         this.image = image;
     }
 
+    public void setName(String n) {
+        this.name = n;
+    }
+
     public String getName(){
         return name;
     }
 
+    public void setBitmap(byte[] b) {
+        this.image = b;
+    }
+    public byte[] getImage() {
+        return this.image;
+    }
     public Bitmap getBitmap(){
         Bitmap b = BitmapFactory.decodeByteArray(image, 0, image.length);
         return b;

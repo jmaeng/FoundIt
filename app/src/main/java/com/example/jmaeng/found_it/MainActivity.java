@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                callAddItemActivity();
             }
         });
 
@@ -122,14 +122,14 @@ public class MainActivity extends AppCompatActivity
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
             //TODO need to change this method to point to the items table
-            ArrayList<byte[]> imageArray = db.getAllImagesWithName();
+            ArrayList<Item> itArray = db.getAllItemImages();
 
-            ArrayList<Bitmap> bitmapArray = new ArrayList<Bitmap>();
             Bitmap b;
             BitmapFactory.Options options = new BitmapFactory.Options();
             int width = 100, height = 100;
 
-            for (byte[] image: imageArray) {
+            for (Item i: itemArray) {
+                byte[] image = i.get_ITEM_IMG();
                 options.inJustDecodeBounds = true;
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
@@ -137,12 +137,7 @@ public class MainActivity extends AppCompatActivity
                 options.inJustDecodeBounds = false;
 
                 b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
-                bitmapArray.add(b);
-            }
-
-            ArrayList<Item> itArray = new ArrayList<Item>(); //TODO make more efficient
-            for (Bitmap bit: bitmapArray) {
-                itemArray.add(new Item(bit));
+                i.setBitmap(b);
             }
 
             return itArray;
@@ -338,5 +333,10 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mainDatabase.closeDB();
+    }
+
+    private void callAddItemActivity() {
+        Intent intent = new Intent(this, AddItemActivity.class);
+        startActivity(intent);
     }
 }
