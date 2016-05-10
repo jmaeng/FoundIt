@@ -1,5 +1,7 @@
 package com.example.jmaeng.found_it;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity
 
     private RecyclerView popCarouselRecView, recentCarouselRecView, lastCarouselRecView;
     private LinearLayoutManager popLM, recentLM, lastLM;
+
+    private ArrayList<String> itemsStored;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,6 +249,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        /*
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -252,8 +257,17 @@ public class MainActivity extends AppCompatActivity
 
         //Configure the search info and add any event listeners here
         //TODO
-
         return super.onCreateOptionsMenu(menu);
+        */
+
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
     }
 
     /*
