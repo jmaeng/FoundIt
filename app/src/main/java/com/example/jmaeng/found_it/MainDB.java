@@ -72,7 +72,7 @@ public class MainDB {
     //Using SQL to create tables
      /*
     ROOMS_TABLE  : Stores all the rooms individually
-    room_name    : Name of the room
+    room_name    : Name of the room (Primary Key)
     room_img     : Thumbnail image of the room (not the room face/wall)
      */
     private static final String CREATE_ROOMS_TABLE =
@@ -84,7 +84,7 @@ public class MainDB {
 
     /*
     FACES_TABLE  : Stores all room face information for specific rooms
-    face_name    : Face/Wall for the associated image. Example: Kitchen_1, Kitchen_2, etc
+    face_name    : Face/Wall for the associated image. Example: Kitchen_1, Kitchen_2, etc (Primary Key)
     face_room    : Room name associated with the face. Example: Kitchen for Kitchen_1
     face_img     : Image for the room face
      */
