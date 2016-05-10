@@ -1,6 +1,6 @@
 package com.example.jmaeng.found_it;
 
-import android.content.Context;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,8 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -46,23 +44,9 @@ public class AllRoomsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Set up GridView
-        //gridView = (GridView)findViewById(R.id.allRoomGridView);
-
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(mainDatabase);
-
-        //ClickListener for each grid (room thumbnail) in gridview TODO
-        /*gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO this should go straight in to the Room Info activity with an intent with a message
-                Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
-                intent.putExtra("roomName", roomArray.get(position).getName());
-                startActivity(intent);
-            }
-        });*/
 
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -220,12 +204,12 @@ public class AllRoomsActivity extends AppCompatActivity
             private final TextView roomName;
             private final ImageView roomImage;
 
-            public ViewHolder(View itemView) {
-                super(itemView);
-                roomName = (TextView) itemView.findViewById(R.id.room_name);
-                roomImage = (ImageView)itemView.findViewById(R.id.room_image);
-                itemView.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
-                itemView.setPadding(PADDING, PADDING, PADDING, PADDING);
+            public ViewHolder(View roomView) {
+                super(roomView);
+                roomName = (TextView) roomView.findViewById(R.id.room_name);
+                roomImage = (ImageView)roomView.findViewById(R.id.room_image);
+                roomView.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+                roomView.setPadding(PADDING, PADDING, PADDING, PADDING);
 
             }
 
@@ -272,7 +256,6 @@ public class AllRoomsActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.

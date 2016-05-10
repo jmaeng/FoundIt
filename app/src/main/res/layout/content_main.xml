@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,103 +9,88 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:scrollbars="none"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.jmaeng.found_it.MainActivity"
     tools:showIn="@layout/app_bar_main"
     >
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Popular" />
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/pop_recycler_carousel_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:orientation="horizontal"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/carousel_image_view" />
 
-            <TextView
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recently Added" />
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/added_recycler_carousel_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:orientation="horizontal"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/carousel_image_view" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last Viewed" />
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/viewed_recycler_carousel_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:orientation="horizontal"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/carousel_image_view" />
+
+        <!--<HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lastViewedHorizontalScrollView"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:scrollbars="none">
+            <LinearLayout
+                android:id="@+id/last_viewed_image_carousel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Popular" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/popularHorizontalScrollView"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:id="@+id/popular_image_carousel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Recently Added" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/recentlyAddedHorizontalScrollView"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:id="@+id/recently_added_image_carousel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last Viewed" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/lastViewedHorizontalScrollView"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:id="@+id/last_viewed_image_carousel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/allHorizontalScrollView"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:id="@+id/all_image_carousel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </LinearLayout>
-            </HorizontalScrollView>
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>-->
 
         </LinearLayout>
-    </ScrollView>
 
 
-</LinearLayout>
+</ScrollView>

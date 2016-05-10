@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -24,6 +25,9 @@ import java.util.ArrayList;
 
 public class MainDB {
 
+    private static final String TAG = MainDB.class.getSimpleName();
+    private static final int CAROUSEL_LIMIT = 8;
+
     // Database
     private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
     private static final int DB_VERSION = 1;
@@ -36,17 +40,17 @@ public class MainDB {
     // Room Column Names
     private static final String ROOM_NAME = "room_name";
     private static final String ROOM_IMG = "room_img";
-    private static final int ROOM_NAME_INDEX = 0;
-    private static final int ROOM_IMG_INDEX = 1;
+   /* private static final int ROOM_NAME_INDEX = 0;
+    private static final int ROOM_IMG_INDEX = 1;*/
 
 
     // Face Column Names
     private static final String FACE_NAME = "face_name";
     private static final String FACE_ROOM = "face_room";
     private static final String FACE_IMG = "face_img";
-    private static final int FACE_NAME_INDEX = 0;
+   /* private static final int FACE_NAME_INDEX = 0;
     private static final int FACE_ROOM_INDEX = 1;
-    private static final int FACE_IMG_INDEX = 2;
+    private static final int FACE_IMG_INDEX = 2;*/
 
     // Item Table Column Names
     private static final String ITEM_NAME = "item_name";
@@ -58,7 +62,7 @@ public class MainDB {
     private static final String ITEM_X = "item_x";
     private static final String ITEM_Y = "item_y";
     private static final String ITEM_IMG = "item_img";
-    private static final int ITEM_NAME_INDEX = 0;
+    /*private static final int ITEM_NAME_INDEX = 0;
     private static final int ITEM_DESC_INDEX = 1;
     private static final int ITEM_LAST_ACCESS_INDEX = 2;
     private static final int ITEM_CREATED_INDEX = 3;
@@ -66,7 +70,7 @@ public class MainDB {
     private static final int ITEM_LOCATION_INDEX = 5;
     private static final int ITEM_X_INDEX = 6;
     private static final int ITEM_Y_INDEX = 7;
-    private static final int ITEM_IMG_INDEX = 8;
+    private static final int ITEM_IMG_INDEX = 8;*/
 
 
     //Using SQL to create tables
@@ -183,7 +187,7 @@ public class MainDB {
      */
     public static synchronized MainDB getInstance(Context context) {
         if (mainDBInstance == null) {
-            mainDBInstance = new MainDB(context);
+            mainDBInstance = new MainDB(context.getApplicationContext());
         }
         return mainDBInstance;
     }
@@ -298,9 +302,9 @@ public class MainDB {
     /**
      * Retrieve a single room and the thumbnail image
      * @param room_name The room's name to search for
-     * @return Room object that stores all the information
+     * @return Room object that stores all the information or null if room doesn't exist
      */
-    public Room getRoomFromDB(String room_name) {
+    public Room getRoomFromDB(String room_name) {  //This should return null if room doesn't exist -- remember to do null checks then -JM
         openReadableDB();
         Room room;
 
@@ -314,6 +318,8 @@ public class MainDB {
             return null;
         }
 
+        int ROOM_NAME_INDEX = c.getColumnIndex(ROOM_NAME);
+        int ROOM_IMG_INDEX = c.getColumnIndex(ROOM_IMG);
         // Move to start of query result
         c.moveToFirst();
         room = new Room(c.getString(ROOM_NAME_INDEX), // Kitchen
@@ -330,15 +336,19 @@ public class MainDB {
      * @return True if item exists, otherwise false
      */
     public boolean checkRoomInDB(String room_name) {
+        boolean roomExists = false;
         openReadableDB();
         String query = "SELECT " + ROOM_NAME +
                 " FROM " + ROOMS_TABLE +
                 " WHERE " + ROOM_NAME + "=\'" + room_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        int cnt = c.getCount();
-        c.close();
+        if (c != null) {
+            roomExists = c.getCount() > 0;
+            c.close();
+        }
         closeDB();
-        return cnt > 0;
+        return roomExists;
+
     }
 
 
@@ -416,9 +426,9 @@ public class MainDB {
     /**
      * Retrieve a single face from the table
      * @param face_name The room face's name to search for
-     * @return RoomFace object that stores all the information
+     * @return RoomFace object that stores all the information or null if roomface doesn't exist
      */
-    public RoomFace getFaceFromDB(String face_name) {
+    public RoomFace getFaceFromDB(String face_name) { //This method is right and should return null -JM
         openReadableDB();
         RoomFace face;
 
@@ -431,6 +441,9 @@ public class MainDB {
             return null;
         }
 
+        int FACE_NAME_INDEX = c.getColumnIndex(FACE_NAME);
+        int FACE_ROOM_INDEX = c.getColumnIndex(FACE_ROOM);
+        int FACE_IMG_INDEX = c.getColumnIndex(FACE_IMG);
         // Move to start of query result
         c.moveToFirst();
         face = new RoomFace(c.getString(FACE_NAME_INDEX), // kitchen_1
@@ -447,15 +460,19 @@ public class MainDB {
      * @return True if item exists, otherwise false
      */
     public boolean checkFaceInDB(String face_name) {
+        boolean faceExists = false;
         openReadableDB();
         String query = "SELECT " + FACE_NAME +
                 " FROM " + FACES_TABLE +
                 " WHERE " + FACE_NAME + "=\'" + face_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        int cnt = c.getCount();
-        c.close();
+        if (c != null) {
+            faceExists = (c.getCount() > 0);
+            c.close();
+        }
+
         closeDB();
-        return cnt > 0;
+        return faceExists;
     }
 
 
@@ -546,9 +563,9 @@ public class MainDB {
     /**
      * Retrieve a single item and all of the associated data by matching the item_name
      * @param item_name The item's name to search for
-     * @return Item object that stores all the information
+     * @return Item object that stores all the information, or null if item doesn't exist
      */
-    public Item getItemFromDB(String item_name) {
+    public Item getItemFromDB(String item_name) { //This method is right and should return null -JM
         openReadableDB();
         Item item;
 
@@ -560,6 +577,16 @@ public class MainDB {
             closeDB();
             return null;
         }
+
+        int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+        int ITEM_DESC_INDEX = c.getColumnIndex(ITEM_DESC);
+        int ITEM_LAST_ACCESS_INDEX = c.getColumnIndex(ITEM_LAST_ACCESS);
+        int ITEM_CREATED_INDEX = c.getColumnIndex(ITEM_CREATED);
+        int ITEM_VIEW_CNT_INDEX = c.getColumnIndex(ITEM_VIEW_CNT);
+        int ITEM_LOCATION_INDEX = c.getColumnIndex(ITEM_LOCATION);
+        int ITEM_X_INDEX = c.getColumnIndex(ITEM_X);
+        int ITEM_Y_INDEX = c.getColumnIndex(ITEM_Y);
+        int ITEM_IMG_INDEX = c.getColumnIndex(ITEM_IMG);
 
         // Move to start of query result
         c.moveToFirst();
@@ -584,22 +611,26 @@ public class MainDB {
      * @return True if item exists, otherwise false
      */
     public boolean checkItemInDB(String item_name) {
+        boolean itemExists = false;
         openReadableDB();
         String query = "SELECT " + ITEM_NAME +
                 " FROM " + ITEMS_TABLE +
                 " WHERE " + ITEM_NAME + "=\'" + item_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        int cnt = c.getCount();
-        c.close();
+        if (c != null) {
+            itemExists = (c.getCount() > 0);
+            c.close();
+        }
+
         closeDB();
-        return cnt > 0;
+        return itemExists;
     }
 
 
 
     /**
      * Get all room names in alphabetical order as an ArrayList
-     * @return ArrayList of all room names
+     * @return ArrayList of all room names, if query return nothing, then will return empty arraylist
      */
     public ArrayList<String> getAllRoomNames() {
         openReadableDB();
@@ -611,31 +642,28 @@ public class MainDB {
                 " ORDER BY " + ROOM_NAME + " COLLATE NOCASE ASC";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        // Query was empty
-        if(c == null) {
-            closeDB();
-            return null;
-        }
-
-        // Gather all rooms
-        c.moveToFirst();
-        for (int i = 0; i < c.getCount(); i++) {
-            if (!c.isNull(ROOM_NAME_INDEX)) {
-                nameArray.add(c.getString(ROOM_NAME_INDEX));
+        // Query is not empty
+        if(c != null) {
+            int ROOM_NAME_INDEX = c.getColumnIndex(ROOM_NAME);
+            // Gather all rooms
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                if (!c.isNull(ROOM_NAME_INDEX)) {
+                    nameArray.add(c.getString(ROOM_NAME_INDEX));
+                }
+                c.moveToNext();
             }
-            c.moveToNext();
+            c.close();
         }
-
-        c.close();
         closeDB();
         return nameArray;
     }
 
     /**
      * Get all stored rooms as an ArrayList of Room objects.
-     * @return ArrayList of all rooms
+     * @return ArrayList of all rooms, or empty arraylist of rooms if query return nothing
      */
-    public ArrayList<Room> getAllRoomImages() {
+    public ArrayList<Room> getAllRoomImages() {  //DO NOT MODIFY -JM
         openReadableDB();
         ArrayList<Room> roomArray = new ArrayList<Room>();
 
@@ -645,34 +673,33 @@ public class MainDB {
                 " ORDER BY " + ROOM_NAME + " COLLATE NOCASE ASC";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        // Query was empty
-        if(c == null) {
-            closeDB();
-            return null;
-        }
-
-        // Gather all rooms
-        c.moveToFirst();
-        for (int i = 0; i < c.getCount(); i++) {
-            if (!c.isNull(ROOM_IMG_INDEX)) {
-                String name = c.getString(ROOM_NAME_INDEX);
-                byte[] bytes = c.getBlob(ROOM_IMG_INDEX);
-                roomArray.add(new Room(name, bytes));
+        // Query is not empty
+        if(c != null) {
+            int ROOM_IMG_INDEX = c.getColumnIndex(ROOM_IMG);
+            int ROOM_NAME_INDEX = c.getColumnIndex(ROOM_NAME);
+            // Gather all rooms
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                if (!c.isNull(ROOM_IMG_INDEX)) {
+                    String name = c.getString(ROOM_NAME_INDEX);
+                    byte[] bytes = c.getBlob(ROOM_IMG_INDEX);
+                    roomArray.add(new Room(name, bytes));
+                }
+                c.moveToNext();
             }
-            c.moveToNext();
+            c.close();
         }
-
-        c.close();
         closeDB();
         return roomArray;
     }
 
     /**
      * Get all faces of the provided room as an ArrayList of RoomFace objects
+     * If query is empty, will return empty arraylist of RoomFaces
      * @param roomName Room to get faces for
      * @return ArrayList of all RoomFace objects related to roomName
      */
-    public ArrayList<RoomFace> getRoomFaceImages(String roomName) {
+    public ArrayList<RoomFace> getRoomFaceImages(String roomName) { //DO NOT MODIFY -JM
         openReadableDB();
         ArrayList<RoomFace> roomFaces = new ArrayList<RoomFace>();
 
@@ -683,24 +710,23 @@ public class MainDB {
                 " ORDER BY " + FACE_NAME + " COLLATE NOCASE ASC";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        // Query returned empty
-        if(c == null) {
-            closeDB();
-            return null;
-        }
-
-        // Gather all room faces
-        c.moveToFirst();
-        for(int i = 0; i < c.getCount(); i++) {
-            if (!c.isNull(FACE_IMG_INDEX)){
-                String roomFaceNum = c.getString(FACE_NAME_INDEX);
-                byte[] image = c.getBlob(FACE_IMG_INDEX);
-                RoomFace roomFace = new RoomFace(roomFaceNum, image);
-                roomFaces.add(roomFace);
+        // Query returned is not empty
+        if(c != null) {
+            int FACE_IMG_INDEX = c.getColumnIndex(FACE_IMG);
+            int FACE_NAME_INDEX = c.getColumnIndex(FACE_NAME);
+            // Gather all room faces
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                if (!c.isNull(FACE_IMG_INDEX)) {
+                    String roomFaceNum = c.getString(FACE_NAME_INDEX);
+                    byte[] image = c.getBlob(FACE_IMG_INDEX);
+                    RoomFace roomFace = new RoomFace(roomFaceNum, image);
+                    roomFaces.add(roomFace);
+                }
+                c.moveToNext();
             }
-            c.moveToNext();
+            c.close();
         }
-        c.close();
         closeDB();
         return roomFaces;
     }
@@ -725,6 +751,7 @@ public class MainDB {
             return null;
         }
 
+        int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
         // Gather all rooms
         c.moveToFirst();
         for (int i = 0; i < c.getCount(); i++) {
@@ -741,41 +768,78 @@ public class MainDB {
 
     /**
      * Get all items with only the item name and image.
+     * If database does not have any items, this method will just return an empty array list of items
      * @return ArrayList of Item with all item names and images stored, all other values are null.
      */
-    public ArrayList<Item> getAllItemImages(){
+    public ArrayList<Item> getAllItemImages(){  //DO NOT MODIFY THIS METHOD -JM
         openReadableDB();
         ArrayList<Item> itemArray = new ArrayList<Item>();
 
         // SQL Query Construction
         String query = "SELECT " + ITEM_NAME + ", " + ITEM_IMG +
                 " FROM " + ITEMS_TABLE +
-                " ORDER BY " + ROOM_NAME + " COLLATE NOCASE ASC";
+                " ORDER BY " + ITEM_NAME + " COLLATE NOCASE ASC";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        // Query returned empty
-        if(c == null) {
-            closeDB();
-            return null;
-        }
-
-        // Gather all room faces
-        Item toAdd;
-        c.moveToFirst();
-        for (int i = 0; i < c.getCount(); i++) {
-            toAdd = new Item();
-            if (!c.isNull(ITEM_IMG_INDEX)) {
-                String name = c.getString(ITEM_NAME_INDEX);
-                byte[] image = c.getBlob(ITEM_IMG_INDEX);
-                toAdd.set_ITEM_NAME(name);
-                toAdd.set_ITEM_IMG(image);
-                itemArray.add(toAdd);
+        //Query returned results
+        if(c != null) {
+            // Gather all item images
+            Item toAdd;
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                toAdd = new Item();
+                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
+                if (!c.isNull(ITEM_IMAGE_INDEX)) {
+                    String name = c.getString(ITEM_NAME_INDEX);
+                    byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    toAdd.set_ITEM_NAME(name);
+                    toAdd.set_ITEM_IMG(image);
+                    itemArray.add(toAdd);
+                }
+                c.moveToNext();
             }
-            c.moveToNext();
+            c.close();
         }
-        c.close();
         closeDB();
         return itemArray;
+    }
+
+    public ArrayList<Item> getMostPopularItemImages() { //DO NOT MODIFY -JM
+        openReadableDB();
+        ArrayList<Item> mostPopItemArray = new ArrayList<Item>();
+
+        // SQL Query Construction
+        String query = "SELECT " + ITEM_NAME + ", " + ITEM_VIEW_CNT + ", " + ITEM_IMG +
+                " FROM " + ITEMS_TABLE +
+                " ORDER BY " + ITEM_VIEW_CNT + " COLLATE NOCASE DESC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        //Query returned results
+        if(c != null) {
+            // Gather the top 8 most popular items
+            Item toAdd;
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount() && i < CAROUSEL_LIMIT; i++) {
+                toAdd = new Item();
+                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+                int ITEM_CNT_INDEX = c.getColumnIndex(ITEM_VIEW_CNT);
+                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
+                if (!c.isNull(ITEM_IMAGE_INDEX)) {
+                    String name = c.getString(ITEM_NAME_INDEX);
+                    byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    int viewCount = Integer.parseInt(c.getString(ITEM_CNT_INDEX));
+                    toAdd.set_ITEM_NAME(name);
+                    toAdd.set_ITEM_IMG(image);
+                    toAdd.set_ITEM_VIEW_CNT(viewCount);
+                    mostPopItemArray.add(toAdd);
+                }
+                c.moveToNext();
+            }
+            c.close();
+        }
+        closeDB();
+        return mostPopItemArray;
     }
 
     /**
@@ -799,6 +863,10 @@ public class MainDB {
             return null;
         }
 
+        int ITEM_IMG_INDEX = c.getColumnIndex(ITEM_IMG);
+        int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+        int ITEM_X_INDEX = c.getColumnIndex(ITEM_X);
+        int ITEM_Y_INDEX = c.getColumnIndex(ITEM_Y);
         // Gather all room faces
         Item toAdd;
         c.moveToFirst();
