@@ -63,9 +63,7 @@ public class AllRoomsActivity extends AppCompatActivity
         createRoomButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Make This button do something bro", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        //TODO waiting for create room activity with camera and photo upload functionality to be complete by Tyler
+                startActivity(new Intent(getApplicationContext(), CreateRoomActivity.class));
             }
         });
 
