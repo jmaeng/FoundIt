@@ -30,7 +30,7 @@ public class MainDB {
 
     // Database
     private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     // Table Names
     private static final String ROOMS_TABLE = "rooms_table";
@@ -888,5 +888,26 @@ public class MainDB {
         c.close();
         closeDB();
         return itemArray;
+    }
+
+    /**
+     * Get the face image of the room to display.
+     * @return byte[] representing the image of the room face
+     *         null otherwise
+     */
+    public byte[] getRoomFaceImage(String faceName) {
+        openReadableDB();
+        byte[] image = null;
+        String[] col = {FACE_IMG};
+        Cursor c = sqlDB.query(FACES_TABLE, col, FACE_NAME + " = " + "\'" + faceName +"\'", null, null, null, FACE_NAME, null);
+        int COL_IMAGE_INDEX = c.getColumnIndex(FACE_IMG);
+        c.moveToFirst();
+        if (!c.isNull(COL_IMAGE_INDEX)){
+            image = c.getBlob(COL_IMAGE_INDEX);
+        }
+        c.close();
+        closeDB();
+        return image;
+
     }
 }

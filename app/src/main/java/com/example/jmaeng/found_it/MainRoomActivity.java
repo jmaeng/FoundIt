@@ -50,9 +50,10 @@ public class MainRoomActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO this should go straight into the bigger image of the room_face with location of items
-               /* Intent intent = new Intent(MainRoomActivity.this, MainRoomActivity.class);
-                intent.putExtra("roomName", roomArray.get(position).getName());
-                startActivity(intent);*/ //TODO need to edit this to be the correct one when clicking a roomFace image
+                Intent intent = new Intent(MainRoomActivity.this, AllItemsInRoom.class);
+                intent.putExtra("roomName", roomName);
+                intent.putExtra("roomFace", roomFaceArray.get(position).getRoomFace());
+                startActivity(intent); //TODO need to edit this to be the correct one when clicking a roomFace image
             }
         });
 
