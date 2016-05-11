@@ -26,4 +26,8 @@
     <string name="item_room_button">Select a room...</string>
     <string name="item_create_item">Create Item</string>
 
+    <!-- Search Bar -->
+    <string name="search_title">Search For An Item</string>
+    <string name="search_hint">Search for an item</string>
+
 </resources>

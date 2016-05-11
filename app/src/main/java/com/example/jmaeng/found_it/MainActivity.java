@@ -1,6 +1,6 @@
 package com.example.jmaeng.found_it;
 
-import android.app.SearchManager;
+//import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,7 +26,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+//import android.widget.SearchView;
+
+import android.app.SearchManager;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import java.util.ArrayList;
 
@@ -241,25 +246,14 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        /*
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
-        //Configure the search info and add any event listeners here
-        //TODO
-        return super.onCreateOptionsMenu(menu);
-        */
-
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        MenuItem searchMenu = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView)searchMenu.getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     /*
