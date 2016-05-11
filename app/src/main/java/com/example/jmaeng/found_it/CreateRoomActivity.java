@@ -248,7 +248,17 @@ public class CreateRoomActivity extends AppCompatActivity
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
 
-
+                        //TODO see below
+                    /* Note for below to work the getRoomFrom DB(String room_name) needs to add (in MainDB.class)
+                    
+                    
+                    if (c.getCount() == 0) {
+                        closeDB();
+                        return null;
+                    }
+                     
+                    right below  if (c ==null) {.....}
+                    */
                     String tempName = name;
                     while(mainDatabase.getRoomFromDB(tempName) != null){ //If room name already exsists add an increment to it
                         tempName = name + (++increment);
