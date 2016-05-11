@@ -30,7 +30,7 @@ public class MainDB {
 
     // Database
     private static final String DB_NAME = "mainTestDB.db"; //TODO change this name when the camera and image saving is complete
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     // Table Names
     private static final String ROOMS_TABLE = "rooms_table";
