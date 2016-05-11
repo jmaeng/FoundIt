@@ -26,4 +26,9 @@
     <string name="item_room_button">Select a room...</string>
     <string name="item_create_item">Create Item</string>
 
+
+    <!-- Create Room Activity -->
+    <string name="room_name_title">Room Name</string>
+
+
 </resources>

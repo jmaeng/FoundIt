@@ -15,6 +15,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="You are in the Create Room Activity" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/room_name_title"
+        android:id="@+id/roomNameTitle"
+        android:layout_marginEnd="67dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="25dp" />
 
 </RelativeLayout>

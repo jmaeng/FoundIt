@@ -17,6 +17,8 @@ import android.view.MenuItem;
 public class CreateRoomActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private MainDB mainDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
