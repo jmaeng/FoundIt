@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 callAddItemActivity();
             }
         });
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView.setLayoutManager(recentLM);
         lastCarouselRecView.setLayoutManager(lastLM);
 
-        //TESTING
         popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
         recentCarouselTask =  new DownloadFromDB(R.id.added_recycler_carousel_view);
         lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
@@ -181,12 +179,6 @@ public class MainActivity extends AppCompatActivity
                 return itemArray.size();
             return 0;
         }
-
-        /*public void swap(ArrayList<Item> itArray) {
-            itemArray.clear();
-            itemArray.addAll(itArray);
-            notifyDataSetChanged();
-        }*/
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
