@@ -16,11 +16,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/room_name_title"
-        android:id="@+id/roomNameTitle"
-        android:layout_marginEnd="67dp"
+        android:text="Name"
+        android:id="@+id/name"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="25dp" />
+        android:layout_alignParentStart="true" />
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editName"
+        android:layout_below="@+id/name"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take Picture"
+        android:id="@+id/button"
+        android:onClick="camera"
+        android:layout_below="@+id/editName"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Picture"
+        android:id="@+id/button2"
+        android:onClick="gallery"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button" />
 </RelativeLayout>
