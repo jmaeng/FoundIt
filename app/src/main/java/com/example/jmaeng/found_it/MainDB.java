@@ -101,16 +101,17 @@ public class MainDB {
 
 
     /*
-    ITEMS_TABLE          : Stores information for all items stored in the database
-    item_name           : Name of the stored item (primary key)
-    item_desc           : Description of the item
-    item_last_accessed  : When the item was last accessed
-    item_creation       : When the item was added to the database
-    item_view_count     : Number of times the item was searched
-    item_location       : The room where the item is stored in
-    item_x              : X-coordinate of where the item is on the image
-    item_y              : Y-coordinate of where the item is on the image
-    item_img            : Image of the item
+    ITEMS_TABLE         : Stores information for all items stored in the database
+                                                                            Example Values for Item
+    item_name           : Name of the stored item (primary key)          -- Laptop
+    item_desc           : Description of the item                        -- Description of Laptop
+    item_last_accessed  : When the item was last accessed                -- May 9, 2016. 12:06 PM
+    item_creation       : When the item was added to the database        -- May 9, 2016. 12:06 PM
+    item_view_count     : Number of times the item was searched          -- 4
+    item_location       : The room face where the item is stored in.     -- Kitchen_1
+    item_x              : X-coordinate of where the item is on the image -- 20
+    item_y              : Y-coordinate of where the item is on the image -- 60
+    item_img            : Image of the item                              -- {blob}
      */
     private static final String CREATE_ITEMS_TABLE =
             "CREATE TABLE IF NOT EXISTS " + ITEMS_TABLE + "("
@@ -261,11 +262,21 @@ public class MainDB {
         if(ret <= 0)
             return false;
 
+        // Get all face names to delete
+        ArrayList<RoomFace> roomFaces = getRoomFaceImages(room.getName());
+
         // Delete all room face entries in faces table; no reason to store faces if room is deleted
         // DELETE FROM faces_table
         // WHERE face_room='room'
         whereClause = FACE_ROOM + "=?";
         ret = sqlDB.delete(FACES_TABLE, whereClause, whereArgs);
+
+        if(ret <= 0)
+            return false;
+
+        // Delete all items from with matching face name (done after deleting faces to avoid error)
+        for(RoomFace face : roomFaces)
+            deleteAllItemsFromFace(face.getRoomFace());
 
         closeDB();
         return ret > 0;
@@ -390,6 +401,11 @@ public class MainDB {
         // DELETE FROM faces_table
         // WHERE face_name='face'
         long ret = sqlDB.delete(FACES_TABLE, whereClause, whereArgs);
+
+        if(ret <= 0)
+            return false;
+
+        deleteAllItemsFromFace(face.getRoomFace());
         closeDB();
         return ret > 0;
     }
@@ -786,10 +802,10 @@ public class MainDB {
             // Gather all item images
             Item toAdd;
             c.moveToFirst();
+            int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+            int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
             for (int i = 0; i < c.getCount(); i++) {
                 toAdd = new Item();
-                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
-                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
@@ -820,11 +836,11 @@ public class MainDB {
             // Gather the top 8 most popular items
             Item toAdd;
             c.moveToFirst();
+            int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+            int ITEM_CNT_INDEX = c.getColumnIndex(ITEM_VIEW_CNT);
+            int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
             for (int i = 0; i < c.getCount() && i < CAROUSEL_LIMIT; i++) {
                 toAdd = new Item();
-                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
-                int ITEM_CNT_INDEX = c.getColumnIndex(ITEM_VIEW_CNT);
-                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
@@ -888,5 +904,15 @@ public class MainDB {
         c.close();
         closeDB();
         return itemArray;
+    }
+
+    private void deleteAllItemsFromFace(String faceName) {
+        // Delete items in room face
+        String whereClause = ITEM_LOCATION + "=?";
+        String whereArgs[] = new String[]{(faceName)};
+
+        // DELETE FROM items_table
+        // WHERE item_location='face'
+        sqlDB.delete(ITEMS_TABLE, whereClause, whereArgs);
     }
 }
