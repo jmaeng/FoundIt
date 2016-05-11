@@ -19,6 +19,9 @@
     3) Contains the API libraries the app needs to be linked against
             (other than the Android framework APIs), such as the Google Maps library.
     -->
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
