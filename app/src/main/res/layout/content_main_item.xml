@@ -12,4 +12,43 @@
     tools:context="com.example.jmaeng.found_it.MainItemActivity"
     tools:showIn="@layout/app_bar_main_item">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/main_item_image"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/main_item_desc_title"
+        android:id="@+id/main_item_desc_title"
+        android:layout_below="@+id/main_item_image"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/main_item_desc"
+        android:layout_below="@+id/main_item_desc_title"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/main_item_room_title"
+        android:id="@+id/main_item_room_title"
+        android:layout_below="@+id/main_item_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/main_item_room"
+        android:layout_below="@+id/main_item_room_title"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

@@ -163,12 +163,9 @@ public class AllItemsActivity extends AppCompatActivity
             holder.getImageView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /*
-                    TODO
                     Intent intent = new Intent(AllItemsActivity.this, MainItemActivity.class);
                     intent.putExtra("itemName", item.get_ITEM_NAME());
                     startActivity(intent);
-                    */
                 }
 
             });

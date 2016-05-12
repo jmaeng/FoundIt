@@ -3,10 +3,7 @@ package com.example.jmaeng.found_it;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,13 +16,14 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 public class MainItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Item item;
     private String itemName;
+    private ImageView itemImage;
+    private TextView itemDesc;
+    private TextView itemRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +31,6 @@ public class MainItemActivity extends AppCompatActivity
         setContentView(R.layout.activity_main_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Intent intent = getIntent();
-
-        item = null;
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -46,6 +40,49 @@ public class MainItemActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Connect with layout
+        itemImage = (ImageView)findViewById(R.id.main_item_image);
+        itemDesc = (TextView)findViewById(R.id.main_item_desc);
+        itemRoom = (TextView)findViewById(R.id.main_item_room);
+
+        // Click on room to display pin location
+        itemRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                Intent callIntent = new Intent(this, _some_class_name_);
+                callIntent.putExtra("pinLocation", item);
+                startActivity(callIntent);
+
+                //TODO retrieve item using the following in the class that is called, then use Item's get X, Y to set pin
+                Intent intent = getIntent();
+                Bundle bundle = intent.getExtras();
+                Item item = null;
+
+                if (bundle.containsKey("pinLocation")){
+                    item = (Item)bundle.get("pinLocation");
+                    getSupportActionBar().setTitle(item.get_ITEM_NAME() + " Location");
+                }
+                */
+                //TODO link to pin location activity
+                Snackbar.make(v, "Show pin location on face image",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
+
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+
+        // Grab item name from intent
+        if (bundle.containsKey("itemName")){
+            itemName = (String)bundle.get("itemName");
+            getSupportActionBar().setTitle(itemName);
+        }
+System.out.println("Item name: " + itemName);
+        MainDB database = MainDB.getInstance(getApplicationContext());
+        (new DownloadFromDB()).execute(database);
     }
 
     @Override
@@ -105,21 +142,23 @@ public class MainItemActivity extends AppCompatActivity
         return true;
     }
 
-    /*
-    AsyncTask class that will obtain info from the database about all the items and then set up the
-    gridview layout with all the obtained information
-     */
     private class DownloadFromDB extends AsyncTask<MainDB, Void, Item> {
 
         @Override
         protected  Item doInBackground(MainDB... params) {
             MainDB db = params[0];
             item = db.getItemFromDB(itemName);
+
             //Query for all the images and put them in the images array I already created.
             return item;
         }
 
         protected void onPostExecute(Item item) {
+            itemImage.setImageBitmap(item.testBitmap()); //TODO is there a better way to display images?
+            itemDesc.setText(item.get_ITEM_DESC());
+            String trim = item.get_ITEM_LOCATION();
+            int cutoff = trim.indexOf('_');
+            itemRoom.setText(trim.substring(0, cutoff) + " -- Tap to see pin location");
         }
     }
 }
