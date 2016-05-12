@@ -1,9 +1,14 @@
 package com.example.jmaeng.found_it;
 
+import android.content.ClipData;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,7 +22,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +42,8 @@ public class AddItemActivity extends AppCompatActivity
     private Button roomField;
     private Button finalizeItem;
     private Item item;
+    private final static int PICK_IMAGE_REQUEST = 1;
+    private byte[] itemImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +64,6 @@ public class AddItemActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
-
         // Connect to database //
         item = new Item();
         database = MainDB.getInstance(getApplicationContext());
@@ -73,7 +80,16 @@ public class AddItemActivity extends AppCompatActivity
                 Intent callIntent = new Intent(this, _some_class_name_);
                 startActivity(callIntent);
                 */
-                //TODO link to camera / gallery to choose image
+                //Uploads from gallery and sets the item img to the uploaded photo.
+
+                //TODO Still doesn't set up the imageView for showing the actual photo of the item though.
+
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Select Picture"), PICK_IMAGE_REQUEST);
+
                 Snackbar.make(v, "Call image select",
                         Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
@@ -82,10 +98,11 @@ public class AddItemActivity extends AppCompatActivity
         // Item Creation Time //
         dateField = (TextView)findViewById(R.id.itemCreationField);
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy. hh:mm aaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         datetime = dateFormat.format(calendar.getTime());
         dateField.setText(datetime);
         item.set_ITEM_CREATED(datetime);
+        item.set_ITEM_ACCESS(datetime);
 
         // Description //
         descField = (EditText)findViewById(R.id.itemDescField);
@@ -118,6 +135,30 @@ public class AddItemActivity extends AppCompatActivity
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
+    }
+
+    /* Handling the image chosen from the gallery */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+
+            if(data.getData() != null){
+                //One image selected
+                try {
+                    Uri mImageUri=data.getData();
+                    Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mImageUri);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+
+                    item.set_ITEM_IMG(byteArray);
+
+                } catch (IOException e) {
+                    Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
+                }
+            } else {
+                Toast toast = Toast.makeText(getApplicationContext(), "Please pick an Item Image", Toast.LENGTH_SHORT);
+            }
+        }
     }
 
     @Override

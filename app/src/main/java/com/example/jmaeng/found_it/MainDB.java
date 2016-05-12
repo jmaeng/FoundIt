@@ -39,17 +39,11 @@ public class MainDB {
     // Room Column Names
     private static final String ROOM_NAME = "room_name";
     private static final String ROOM_IMG = "room_img";
-   /* private static final int ROOM_NAME_INDEX = 0;
-    private static final int ROOM_IMG_INDEX = 1;*/
-
 
     // Face Column Names
     private static final String FACE_NAME = "face_name";
     private static final String FACE_ROOM = "face_room";
     private static final String FACE_IMG = "face_img";
-   /* private static final int FACE_NAME_INDEX = 0;
-    private static final int FACE_ROOM_INDEX = 1;
-    private static final int FACE_IMG_INDEX = 2;*/
 
     // Item Table Column Names
     private static final String ITEM_NAME = "item_name";
@@ -61,15 +55,6 @@ public class MainDB {
     private static final String ITEM_X = "item_x";
     private static final String ITEM_Y = "item_y";
     private static final String ITEM_IMG = "item_img";
-    /*private static final int ITEM_NAME_INDEX = 0;
-    private static final int ITEM_DESC_INDEX = 1;
-    private static final int ITEM_LAST_ACCESS_INDEX = 2;
-    private static final int ITEM_CREATED_INDEX = 3;
-    private static final int ITEM_VIEW_CNT_INDEX = 4;
-    private static final int ITEM_LOCATION_INDEX = 5;
-    private static final int ITEM_X_INDEX = 6;
-    private static final int ITEM_Y_INDEX = 7;
-    private static final int ITEM_IMG_INDEX = 8;*/
 
 
     //Using SQL to create tables
@@ -103,8 +88,8 @@ public class MainDB {
     ITEMS_TABLE          : Stores information for all items stored in the database
     item_name           : Name of the stored item (primary key)
     item_desc           : Description of the item
-    item_last_accessed  : When the item was last accessed
-    item_creation       : When the item was added to the database
+    item_last_accessed  : When the item was last acceseds
+    item_created       : When the item was added to the database FORMAT: SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     item_view_count     : Number of times the item was searched
     item_location       : The room where the item is stored in
     item_x              : X-coordinate of where the item is on the image
@@ -313,7 +298,7 @@ public class MainDB {
                 " WHERE " + ROOM_NAME + "=\'" + room_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -436,7 +421,7 @@ public class MainDB {
                 " FROM " + FACES_TABLE +
                 " WHERE " + FACE_NAME + "=\'" + face_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -573,7 +558,7 @@ public class MainDB {
                 " FROM " + ITEMS_TABLE +
                 " WHERE " + ITEM_NAME + "=\'" + item_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -746,7 +731,7 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
 
         // Query was empty
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -843,6 +828,54 @@ public class MainDB {
     }
 
     /**
+     * This will return either the arraylist of items of recently added or arraylist of items
+     * last viewed depending on which recyclerViewID is given.
+     * @return
+     */
+    public ArrayList<Item> getRecentlyAddedOrLastViewedItemImages(int recyclerViewID) {
+        openReadableDB();
+        ArrayList<Item> recentlyAddedOrLastViewedItemArray = new ArrayList<Item>();
+        String targetField;
+
+        if (recyclerViewID == R.id.recently_added_recycler_carousel_view) {
+            targetField = ITEM_CREATED;
+        } else {
+            //last viewed
+            targetField = ITEM_LAST_ACCESS;
+        }
+        // SQL Query Construction
+        String query = "SELECT " + ITEM_NAME + ", " + ITEM_CREATED + ", " + ITEM_IMG +
+                " FROM " + ITEMS_TABLE +
+                " ORDER BY " + "datetime(" + targetField + ")" + " COLLATE NOCASE DESC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        //Query returned results
+        if(c != null) {
+            // Gather the top 8 most recently added items
+            Item toAdd;
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount() && i < CAROUSEL_LIMIT; i++) {
+                toAdd = new Item();
+                int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+                int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
+                if (!c.isNull(ITEM_IMAGE_INDEX)) {
+                    String name = c.getString(ITEM_NAME_INDEX);
+                    byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    //Log.d(TAG, "***** " + name + " ::: " + itemCreatedDateTime);
+                    toAdd.set_ITEM_NAME(name);
+                    toAdd.set_ITEM_IMG(image);
+                    recentlyAddedOrLastViewedItemArray.add(toAdd);
+                }
+                c.moveToNext();
+            }
+            c.close();
+        }
+        closeDB();
+        return recentlyAddedOrLastViewedItemArray;
+    }
+
+
+    /**
      * Get all items with x- and y-coordinates for the item pin.
      * @return ArrayList of Item with all item names, item pin coordinates and images stored,
      * all other values are null.
@@ -858,7 +891,7 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
 
         // Query returned empty
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }

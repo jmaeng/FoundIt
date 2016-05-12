@@ -29,6 +29,8 @@ import java.util.ArrayList;
 public class AllRoomsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //TODO NEED TO UPDATE ROOM GRIDVIEW, IF ROOM DATABASE CHANGES
+
     private MainDB mainDatabase;
     private ArrayList<Room> roomArray;
     private GridView gridView;

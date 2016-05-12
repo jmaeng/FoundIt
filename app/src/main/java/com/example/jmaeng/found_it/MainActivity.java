@@ -6,36 +6,42 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //TODO NEED TO TEST IF DATABASE UPDATES AFTER ITEM IS ADDED PROPERLY
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CAROUSEL_LIMIT = 8;
     private NavigationView navigationView;
     private MainDB mainDatabase;
-    private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
-    //private ArrayList<Item> itemArray;
-
+    private DownloadFromDB popCarouselTask, recentlyAddedCarouselTask, lastViewCarouselTask;
     private RecyclerView popCarouselRecView, recentCarouselRecView, lastCarouselRecView;
+    private CarouselViewAdaptor popCarouselAdapter, recentCarouselAdapter, lastCarouselAdapter;
     private LinearLayoutManager popLM, recentLM, lastLM;
 
     @Override
@@ -69,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         mainDatabase = MainDB.getInstance(getApplicationContext());
 
         popCarouselRecView = (RecyclerView)findViewById(R.id.pop_recycler_carousel_view);
-        recentCarouselRecView = (RecyclerView)findViewById(R.id.added_recycler_carousel_view);
+        recentCarouselRecView = (RecyclerView)findViewById(R.id.recently_added_recycler_carousel_view);
         lastCarouselRecView = (RecyclerView)findViewById(R.id.viewed_recycler_carousel_view);
 
         popLM = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -85,11 +91,11 @@ public class MainActivity extends AppCompatActivity
         lastCarouselRecView.setLayoutManager(lastLM);
 
         popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
-        recentCarouselTask =  new DownloadFromDB(R.id.added_recycler_carousel_view);
+        recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
         lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
         popCarouselTask.execute(mainDatabase);
-        recentCarouselTask.execute(mainDatabase);
+        recentlyAddedCarouselTask.execute(mainDatabase);
         lastViewCarouselTask.execute(mainDatabase);
 
     }
@@ -97,7 +103,6 @@ public class MainActivity extends AppCompatActivity
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Item>> {
 
         private int recyclerViewID;
-
         public DownloadFromDB(int recyclerViewID) {
             this.recyclerViewID = recyclerViewID;
         }
@@ -108,10 +113,9 @@ public class MainActivity extends AppCompatActivity
             ArrayList<Item> itArray;
             if (recyclerViewID == R.id.pop_recycler_carousel_view) {
                 itArray = db.getMostPopularItemImages();
-            } else if (recyclerViewID == R.id.added_recycler_carousel_view){
-                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+
             } else {
-                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+                itArray = db.getRecentlyAddedOrLastViewedItemImages(recyclerViewID);
             }
 
             Bitmap b;
@@ -127,7 +131,7 @@ public class MainActivity extends AppCompatActivity
                 options.inSampleSize = calculateInSampleSize(options, width, height);
                 options.inJustDecodeBounds = false;
 
-                b = BitmapFactory.decodeByteArray(image, 0, image.length, options);
+                b = BitmapFactory.decodeByteArray(image, 0, image.length, options); //OOM ERROR AGAIN
                 item.setBitmap(b);
             }
 
@@ -136,11 +140,31 @@ public class MainActivity extends AppCompatActivity
 
         protected void onPostExecute(final ArrayList<Item> itArray) {
             if (recyclerViewID == R.id.pop_recycler_carousel_view) {
-                popCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
-            } else if (recyclerViewID == R.id.viewed_recycler_carousel_view){
-                recentCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
+                if (popCarouselAdapter == null) {
+                    popCarouselAdapter = new CarouselViewAdaptor(itArray);
+                    popCarouselRecView.setAdapter(popCarouselAdapter);
+
+                } else {
+                    popCarouselAdapter.swap(itArray);
+                }
+
+            } else if (recyclerViewID == R.id.recently_added_recycler_carousel_view){
+                if (recentCarouselAdapter == null) {
+                    recentCarouselAdapter = new CarouselViewAdaptor(itArray);
+                    recentCarouselRecView.setAdapter(recentCarouselAdapter);
+
+                } else {
+                    recentCarouselAdapter.swap(itArray);
+                }
+
             } else {
-                lastCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
+                if (lastCarouselAdapter == null) {
+                    lastCarouselAdapter = new CarouselViewAdaptor(itArray);
+                    lastCarouselRecView.setAdapter(lastCarouselAdapter);
+
+                } else {
+                    lastCarouselAdapter.swap(itArray);
+                }
             }
         }
     }
@@ -164,7 +188,19 @@ public class MainActivity extends AppCompatActivity
             final Item item = itemArray.get(position);
             holder.getImageView().setImageBitmap(item.getBitmap());
 
-            //onclick listener goes here too.
+            //onclick listener goes here too. //TODO
+        }
+
+        public void swap(ArrayList<Item> updatedItemList) {
+            if (itemArray != null) {
+                itemArray.clear();
+                itemArray.addAll(updatedItemList);
+            } else {
+                itemArray = updatedItemList;
+            }
+
+            if (!itemArray.equals(updatedItemList))
+                notifyDataSetChanged();
         }
 
         @Override
@@ -207,17 +243,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return inSampleSize;
-    }
-
-    /*
-    Helps save the state of the UI. Do not use to store persistent data (data that is saved to database),
-     use onPause() for that instead for that.
-     Overridding in case we want to save additional information than the default
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
     }
 
     @Override
@@ -269,11 +294,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    /** For MainDB to recognize that a room or item is to be deleted */
-    public String getAction () {
-        return "delete";
-    }
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -291,7 +311,6 @@ public class MainActivity extends AppCompatActivity
                 //TODO
         }
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -304,7 +323,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop(){
         super.onStop();
         popCarouselTask.cancel(false);
-        recentCarouselTask.cancel(false);
+        recentlyAddedCarouselTask.cancel(false);
         lastViewCarouselTask.cancel(false);
 
     }
@@ -312,14 +331,29 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestart(){
         super.onRestart();
-        //TODO have to requery the database to change all the carousels
+        Log.d(TAG, "RESTARTING MAIN ACTIVITY"); //happens on back press
+        //have to requery the database to change all the carousels
+        popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
+        recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
+        lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
+        popCarouselTask.execute(mainDatabase);
+        recentlyAddedCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        //TODO have to requery the database to change all the carousels.
+        Log.d(TAG, "RESUMING MAIN ACTIVITY"); //happens when onCreate is called too
+        //have to requery the database to change all the carousels.
+        popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
+        recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
+        lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
+
+        popCarouselTask.execute(mainDatabase);
+        recentlyAddedCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);
 
     }
     @Override
