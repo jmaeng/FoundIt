@@ -46,7 +46,6 @@ public class CreateRoomActivity extends AppCompatActivity
     private final static int THUMBNAIL_SIZE = 400;
     private final static int PADDING = 10;
     private final static int PICK_IMAGE_REQUEST = 1;
-    //private final static int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
 
     @Override
@@ -83,17 +82,6 @@ public class CreateRoomActivity extends AppCompatActivity
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(Intent.createChooser(intent,
                         "Select Picture"), PICK_IMAGE_REQUEST);
-               /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overridden method
-
-                } else {*/
-                    //permissions are unnecessary
-                  /*  startGalleryIntent();
-                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);*/
-                /*}*/
             }
 
         });
