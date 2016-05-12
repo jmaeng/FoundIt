@@ -98,10 +98,11 @@ public class AddItemActivity extends AppCompatActivity
         // Item Creation Time //
         dateField = (TextView)findViewById(R.id.itemCreationField);
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy. hh:mm aaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         datetime = dateFormat.format(calendar.getTime());
         dateField.setText(datetime);
         item.set_ITEM_CREATED(datetime);
+        item.set_ITEM_ACCESS(datetime);
 
         // Description //
         descField = (EditText)findViewById(R.id.itemDescField);

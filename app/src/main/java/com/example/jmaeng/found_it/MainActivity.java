@@ -6,11 +6,9 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -24,6 +22,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -34,9 +33,7 @@ public class MainActivity extends AppCompatActivity
     private static final int CAROUSEL_LIMIT = 8;
     private NavigationView navigationView;
     private MainDB mainDatabase;
-    private DownloadFromDB popCarouselTask, recentCarouselTask, lastViewCarouselTask;
-    //private ArrayList<Item> itemArray;
-
+    private DownloadFromDB popCarouselTask, recentlyAddedCarouselTask, lastViewCarouselTask;
     private RecyclerView popCarouselRecView, recentCarouselRecView, lastCarouselRecView;
     private LinearLayoutManager popLM, recentLM, lastLM;
 
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         mainDatabase = MainDB.getInstance(getApplicationContext());
 
         popCarouselRecView = (RecyclerView)findViewById(R.id.pop_recycler_carousel_view);
-        recentCarouselRecView = (RecyclerView)findViewById(R.id.added_recycler_carousel_view);
+        recentCarouselRecView = (RecyclerView)findViewById(R.id.recently_added_recycler_carousel_view);
         lastCarouselRecView = (RecyclerView)findViewById(R.id.viewed_recycler_carousel_view);
 
         popLM = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -87,11 +84,11 @@ public class MainActivity extends AppCompatActivity
         lastCarouselRecView.setLayoutManager(lastLM);
 
         popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
-        recentCarouselTask =  new DownloadFromDB(R.id.added_recycler_carousel_view);
+        recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
         lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
         popCarouselTask.execute(mainDatabase);
-        recentCarouselTask.execute(mainDatabase);
+        recentlyAddedCarouselTask.execute(mainDatabase);
         lastViewCarouselTask.execute(mainDatabase);
 
     }
@@ -110,10 +107,9 @@ public class MainActivity extends AppCompatActivity
             ArrayList<Item> itArray;
             if (recyclerViewID == R.id.pop_recycler_carousel_view) {
                 itArray = db.getMostPopularItemImages();
-            } else if (recyclerViewID == R.id.added_recycler_carousel_view){
-                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+
             } else {
-                itArray = db.getAllItemImages(); //TODO change this later once correct method is created
+                itArray = db.getRecentlyAddedOrLastViewedItemImages(recyclerViewID);
             }
 
             Bitmap b;
@@ -139,7 +135,7 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(final ArrayList<Item> itArray) {
             if (recyclerViewID == R.id.pop_recycler_carousel_view) {
                 popCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
-            } else if (recyclerViewID == R.id.viewed_recycler_carousel_view){
+            } else if (recyclerViewID == R.id.recently_added_recycler_carousel_view){
                 recentCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
             } else {
                 lastCarouselRecView.setAdapter(new CarouselViewAdaptor(itArray));
@@ -166,7 +162,7 @@ public class MainActivity extends AppCompatActivity
             final Item item = itemArray.get(position);
             holder.getImageView().setImageBitmap(item.getBitmap());
 
-            //onclick listener goes here too.
+            //onclick listener goes here too. //TODO
         }
 
         @Override
@@ -300,7 +296,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop(){
         super.onStop();
         popCarouselTask.cancel(false);
-        recentCarouselTask.cancel(false);
+        recentlyAddedCarouselTask.cancel(false);
         lastViewCarouselTask.cancel(false);
 
     }
