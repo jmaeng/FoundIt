@@ -29,11 +29,16 @@
     <!-- Search Bar -->
     <string name="search_title">Search For An Item</string>
     <string name="search_hint">Search for an item</string>
+
+    <!-- All Items Activity -->
     <string name="title_activity_all_items">AllItemsActivity</string>
-    <string name="title_activity_main_item">MainItemActivity</string>
 
     <!-- Main Item Activity -->
+    <string name="title_activity_main_item">MainItemActivity</string>
     <string name="main_item_desc_title">Description</string>
     <string name="main_item_room_title">Location</string>
+
+    <!-- Create Room Activity -->
+    <string name="room_name_title">Room Name</string>
 
 </resources>
