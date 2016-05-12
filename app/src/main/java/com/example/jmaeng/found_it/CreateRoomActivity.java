@@ -19,8 +19,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +41,10 @@ public class CreateRoomActivity extends AppCompatActivity
     private EditText roomNameField;
     private Room room;
     private Button createRoomButton;
+    private GridView gridView;
     private ArrayList<Uri> mArrayUri = null;
+    private final static int THUMBNAIL_SIZE = 400;
+    private final static int PADDING = 10;
     private final static int PICK_IMAGE_REQUEST = 1;
     //private final static int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
@@ -46,6 +56,7 @@ public class CreateRoomActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        gridView = (GridView)findViewById(R.id.mainRoomGridView);
         mainDatabase = MainDB.getInstance(getApplicationContext());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -106,17 +117,17 @@ public class CreateRoomActivity extends AppCompatActivity
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
 
             //If Single image selected then it will fetch from Gallery
-            if(data.getData()!=null){
+            if (data.getData() != null) {
                 //One image selected
-                Uri mImageUri=data.getData();
-                mArrayUri.add((Uri)mImageUri);
+                Uri mImageUri = data.getData();
+                mArrayUri.add((Uri) mImageUri);
 
             } else {
                 //Multiple images selected
-                if(data.getClipData() != null){
-                    ClipData mClipData=data.getClipData();
+                if (data.getClipData() != null) {
+                    ClipData mClipData = data.getClipData();
 
-                    for(int i=0;i < mClipData.getItemCount(); i++){
+                    for (int i = 0; i < mClipData.getItemCount(); i++) {
                         ClipData.Item item = mClipData.getItemAt(i);
                         Uri uri = item.getUri();
                         mArrayUri.add(uri);
@@ -124,6 +135,78 @@ public class CreateRoomActivity extends AppCompatActivity
                     Log.d(TAG, "Selected Images" + mArrayUri.size());
                 }
             }
+            if (mArrayUri != null) {
+                //LinearLayout linearLayout = (LinearLayout) findViewById(R.id.mylin);
+                //linearLayout.removeAllViews();
+                ((TextView) findViewById(R.id.imageSelected)).setVisibility(View.VISIBLE);
+                for (int i = 0; i < mArrayUri.size(); i++) {
+                    ImageView iv = new ImageView(this);
+                    iv.setLayoutParams(new AbsListView.LayoutParams(
+                            AbsListView.LayoutParams.MATCH_PARENT,
+                            AbsListView.LayoutParams.MATCH_PARENT));
+
+                    try {
+                        gridView.setAdapter(new ImageAdapter(CreateRoomActivity.this));
+                        /*Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(i));
+                        iv.setImageBitmap(bitmap);
+                        linearLayout.addView(iv);*/
+                    } catch (/*IO*/Exception e) {
+                        Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    /*
+   ImageAdapter for all the images in the grid representing different rooms
+    */
+    public class ImageAdapter extends BaseAdapter {
+        private Context context;
+
+        public ImageAdapter(Context c) {
+            context = c;
+        }
+
+        @Override
+        public int getCount() {
+            return mArrayUri.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mArrayUri.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+        //create new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
+            //Uri uri = mArrayUri.get(position);
+
+            if (convertView == null && mArrayUri != null) {
+                imageView = new ImageView(context);
+
+                try {
+                    imageView.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(position)));
+                } catch (IOException e) {
+                    Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
+                    e.printStackTrace();
+                }
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+                imageView.setPadding(PADDING, PADDING, PADDING, PADDING);
+
+            } else {
+                imageView = (ImageView)convertView;
+            }
+
+            return imageView;
         }
     }
 
@@ -157,9 +240,13 @@ public class CreateRoomActivity extends AppCompatActivity
             for (int i = 0; i < mArrayUri.size(); i++ ) {
                 try {
                     Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(i));
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
+
+                    byte[] byteArray = getBitmapAsByteArray(bmp);
+                    //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    //bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    //byte[] byteArray = stream.toByteArray();
+
+
 
                     if (i == 0) {
                         room = new Room(roomName,byteArray);
@@ -172,7 +259,14 @@ public class CreateRoomActivity extends AppCompatActivity
                     Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
                 }
             }
+            mArrayUri.clear();
+            gridView.setAdapter(null);
+            ((TextView) findViewById(R.id.imageSelected)).setVisibility(View.INVISIBLE);
+
+
         }
+
+
         return true;
     }
 
