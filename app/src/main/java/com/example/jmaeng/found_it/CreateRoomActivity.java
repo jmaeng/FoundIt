@@ -213,7 +213,7 @@ public class CreateRoomActivity extends AppCompatActivity
 
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        //bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
     }
 
@@ -242,11 +242,6 @@ public class CreateRoomActivity extends AppCompatActivity
                     Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(i));
 
                     byte[] byteArray = getBitmapAsByteArray(bmp);
-                    //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    //bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    //byte[] byteArray = stream.toByteArray();
-
-
 
                     if (i == 0) {
                         room = new Room(roomName,byteArray);
@@ -265,8 +260,6 @@ public class CreateRoomActivity extends AppCompatActivity
 
 
         }
-
-
         return true;
     }
 
@@ -327,25 +320,6 @@ public class CreateRoomActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-   /* public void startGalleryIntent(){
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);
-    }*/
-
-/*    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission is granted
-                startGalleryIntent();
-            } else {
-                Toast.makeText(CreateRoomActivity.this, "Until you grant the permission, " +
-                        "we cannot access your gallery", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
 
     /**
      * Tells user to select a picture in a toast
