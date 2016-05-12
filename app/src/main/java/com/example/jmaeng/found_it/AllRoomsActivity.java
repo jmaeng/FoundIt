@@ -5,20 +5,19 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
@@ -160,7 +159,6 @@ public class AllRoomsActivity extends AppCompatActivity
 
     //the Recycler Adaptor that will connect the room data to UI
     public class RecyclerViewAdaptor extends RecyclerView.Adapter<RecyclerViewAdaptor.ViewHolder> {
-
         public RecyclerViewAdaptor() {
 
         }
@@ -184,13 +182,38 @@ public class AllRoomsActivity extends AppCompatActivity
                     intent.putExtra("roomName", room.getName());
                     startActivity(intent);
                 }
+            });
 
+            holder.getImageView().setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final Room tempRoom = mainDatabase.getRoomFromDB(room.getName());
+
+                    mainDatabase.deleteRoomFromDB(room);
+                    roomArray.remove(room);
+                    notifyDataSetChanged();
+
+                    Snackbar snackbar = Snackbar
+                            .make(v, room.getName() + " has been deleted", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    //add back to database
+                                    mainDatabase.addNewRoomToDB(tempRoom);
+                                    roomArray.add(room);
+                                    //refresh RecyclerView again
+                                    notifyDataSetChanged();
+                                }
+                            });
+                    snackbar.show();
+                    return true;
+                }
             });
         }
 
         @Override
-        public int getItemCount(){
-            if(roomArray != null)
+        public int getItemCount() {
+            if (roomArray != null)
                 return roomArray.size();
             return 0;
         }
@@ -251,8 +274,8 @@ public class AllRoomsActivity extends AppCompatActivity
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+            return super.onOptionsItemSelected(item);
+        }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -275,3 +298,4 @@ public class AllRoomsActivity extends AppCompatActivity
         return true;
     }
 }
+

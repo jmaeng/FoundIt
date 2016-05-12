@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,12 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -55,6 +54,8 @@ public class MainRoomActivity extends AppCompatActivity
                 startActivity(intent);*/ //TODO need to edit this to be the correct one when clicking a roomFace image
             }
         });
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +120,7 @@ public class MainRoomActivity extends AppCompatActivity
             context = c;
         }
 
+
         @Override
         public int getCount() {
             return roomFaceArray.size();
@@ -133,10 +135,25 @@ public class MainRoomActivity extends AppCompatActivity
         public long getItemId(int position) {
             return 0;
         }
+
         //create new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView imageView;
             RoomFace roomFace = roomFaceArray.get(position);
+
+            convertView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Context context = getApplicationContext();
+                    CharSequence text = "Hello toast!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                    return true;
+                }
+            });
 
             if (convertView == null) {
                 imageView = new ImageView(context);
@@ -144,6 +161,7 @@ public class MainRoomActivity extends AppCompatActivity
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
                 imageView.setPadding(PADDING, PADDING, PADDING, PADDING);
+
 
             } else {
                 imageView = (ImageView)convertView;
