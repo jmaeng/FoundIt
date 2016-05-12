@@ -313,7 +313,7 @@ public class MainDB {
                 " WHERE " + ROOM_NAME + "=\'" + room_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
 
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -436,7 +436,7 @@ public class MainDB {
                 " FROM " + FACES_TABLE +
                 " WHERE " + FACE_NAME + "=\'" + face_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -573,7 +573,7 @@ public class MainDB {
                 " FROM " + ITEMS_TABLE +
                 " WHERE " + ITEM_NAME + "=\'" + item_name + "\'";
         Cursor c = sqlDB.rawQuery(query, null);
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -746,7 +746,7 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
 
         // Query was empty
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }
@@ -858,7 +858,7 @@ public class MainDB {
         Cursor c = sqlDB.rawQuery(query, null);
 
         // Query returned empty
-        if(c == null) {
+        if(c == null || c.getCount() == 0) {
             closeDB();
             return null;
         }

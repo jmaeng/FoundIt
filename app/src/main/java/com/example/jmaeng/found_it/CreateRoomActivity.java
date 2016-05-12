@@ -1,17 +1,15 @@
 package com.example.jmaeng.found_it;
 
-import android.Manifest;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,9 +24,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class CreateRoomActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,10 +34,10 @@ public class CreateRoomActivity extends AppCompatActivity
     private EditText roomNameField;
     private Room room;
     private Button createRoomButton;
-    private ArrayList<byte[]> roomFaceImageArray;
-    private ArrayList<Bitmap> selectedRoomFacesArray;
-    private final static int REQUEST_CODE = 0;
-    private final static int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 100;
+    private ArrayList<Uri> mArrayUri = null;
+    private final static int PICK_IMAGE_REQUEST = 1;
+    //private final static int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private static final String TAG = CreateRoomActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,26 +58,31 @@ public class CreateRoomActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        /* Getting all the info for the new room being created */
-        roomFaceImageArray = new ArrayList<byte[]>();
-        selectedRoomFacesArray = new ArrayList<Bitmap>();
-
         roomNameField = (EditText)findViewById(R.id.room_name_field);
         createRoomButton = (Button)findViewById(R.id.create_room_button);
+        mArrayUri=new ArrayList<Uri>();
 
         /* Have the create room button access the photo gallery of the phone and upload images here */
         createRoomButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Select Picture"), PICK_IMAGE_REQUEST);
+               /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                         checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                     //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overridden method
 
-                } else {
-                    Toast.makeText(CreateRoomActivity.this, "Until you grant the permission, we cannot access your gallery", Toast.LENGTH_SHORT).show();
-                }
+                } else {*/
+                    //permissions are unnecessary
+                  /*  startGalleryIntent();
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);*/
+                /*}*/
             }
 
         });
@@ -90,10 +92,7 @@ public class CreateRoomActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!finalizeRoomCreation()) {
-                    Snackbar.make(view, "Room name must be unique.",
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                } else {
+                if(finalizeRoomCreation()) {
                     Intent intent = new Intent(CreateRoomActivity.this, MainRoomActivity.class);
                     intent.putExtra("roomName", room.getName());
                     startActivity(intent);
@@ -103,67 +102,77 @@ public class CreateRoomActivity extends AppCompatActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (requestCode == RESULT_OK && data != null) {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor c = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                if (c != null) {
-                    c.moveToFirst();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
 
-                    int colIdx = c.getColumnIndex(filePathColumn[0]);
-                    String filePath = c.getString(colIdx);
-                    c.close();
-
-                    Bitmap selectedImg = BitmapFactory.decodeFile(filePath);
-                    selectedRoomFacesArray.add(selectedImg);
-
-                    /* TODO Send the image to the grid view to show and allow for more uploads or
-                    going ahead and add this room entry */
-
-                    //Convert and same image as byte array so we can save this to DB later
-                    byte[] roomImage = getBitmapAsByteArray(selectedImg);
-                    roomFaceImageArray.add(roomImage);
-                }
-
+            //If Single image selected then it will fetch from Gallery
+            if(data.getData()!=null){
+                //One image selected
+                Uri mImageUri=data.getData();
+                mArrayUri.add((Uri)mImageUri);
 
             } else {
-                Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
-        }
+                //Multiple images selected
+                if(data.getClipData() != null){
+                    ClipData mClipData=data.getClipData();
 
+                    for(int i=0;i < mClipData.getItemCount(); i++){
+                        ClipData.Item item = mClipData.getItemAt(i);
+                        Uri uri = item.getUri();
+                        mArrayUri.add(uri);
+                    }
+                    Log.d(TAG, "Selected Images" + mArrayUri.size());
+                }
+            }
+        }
     }
+
 
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        //bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
     }
+
     /* Will create the new room i*/
     public boolean finalizeRoomCreation(){
         String roomName = roomNameField.getText().toString();
 
+        boolean nameExists = mainDatabase.checkRoomInDB(roomName);
         //Room name must be unique
-        if (mainDatabase.checkRoomInDB(roomName)) {
+        if (nameExists || mArrayUri == null || roomName.equals("") || mArrayUri.size() == 0) {
+            if (nameExists) {
+                selectPicPlz(2);
+            } else if (mArrayUri == null || mArrayUri.size() == 0){
+                selectPicPlz(1);
+            } else {
+                selectPicPlz(0);
+            }
+
             return false;
         }
 
-        //Add to room database
-        mainDatabase.addNewRoomToDB(new Room(roomName, roomFaceImageArray.get(0)));
+        if (mArrayUri != null && !roomName.equals("")) {
+            int increment = 0;
+            for (int i = 0; i < mArrayUri.size(); i++ ) {
+                try {
+                    Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(i));
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
 
-        //Add all room faces to database
-        int i = 1;
-        for (byte[] roomFaceImg: roomFaceImageArray) {
-            mainDatabase.addNewFaceToDB(new RoomFace(roomName + " " + i, roomName, roomFaceImg));
-            i++;
+                    if (i == 0) {
+                        room = new Room(roomName,byteArray);
+                        mainDatabase.addNewRoomToDB(room);
+                    }
+                    RoomFace rf = new RoomFace(roomName + "_" + i, roomName, byteArray);
+                    mainDatabase.addNewFaceToDB(rf);
+
+                } catch (IOException e) {
+                    Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
+                }
+            }
         }
-
         return true;
     }
 
@@ -225,17 +234,44 @@ public class CreateRoomActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
+   /* public void startGalleryIntent(){
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);
+    }*/
+
+/*    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission is granted
-                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, REQUEST_CODE);
+                startGalleryIntent();
             } else {
-                Toast.makeText(this, "Until you grant the permission, we cannot access your gallery", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateRoomActivity.this, "Until you grant the permission, " +
+                        "we cannot access your gallery", Toast.LENGTH_SHORT).show();
             }
         }
+    }*/
+
+    /**
+     * Tells user to select a picture in a toast
+     * wrong -> 0 = name is missing
+     *         1 = pics are missing
+     */
+    private void selectPicPlz(int wrong){
+        Context context = getApplicationContext();
+        CharSequence text = "";
+        if (wrong == 0) {
+            text = "Please enter a room name.";
+        } else if (wrong == 1) {
+            text = "Please select an image.";
+        } else if (wrong == 2) {
+            text = "Room Name must be unique.";
+        }
+
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 }
