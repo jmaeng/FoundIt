@@ -156,4 +156,8 @@ public class Item {
     public Bitmap testBitmap() {
         return BitmapFactory.decodeByteArray(ITEM_IMG, 0, ITEM_IMG.length);
     }
+
+    public void inc_VIEW_CNT() {
+        this.ITEM_VIEW_CNT++;
+    }
 }

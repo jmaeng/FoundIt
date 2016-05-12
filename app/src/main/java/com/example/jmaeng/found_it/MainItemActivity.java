@@ -16,9 +16,13 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private MainDB database;
     private Item item;
     private String itemName;
     private ImageView itemImage;
@@ -80,8 +84,8 @@ public class MainItemActivity extends AppCompatActivity
             itemName = (String)bundle.get("itemName");
             getSupportActionBar().setTitle(itemName);
         }
-System.out.println("Item name: " + itemName);
-        MainDB database = MainDB.getInstance(getApplicationContext());
+
+        database = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(database);
     }
 
@@ -146,19 +150,29 @@ System.out.println("Item name: " + itemName);
 
         @Override
         protected  Item doInBackground(MainDB... params) {
-            MainDB db = params[0];
-            item = db.getItemFromDB(itemName);
+            item = database.getItemFromDB(itemName);
 
             //Query for all the images and put them in the images array I already created.
             return item;
         }
 
         protected void onPostExecute(Item item) {
+            // Update activity display
             itemImage.setImageBitmap(item.testBitmap()); //TODO is there a better way to display images?
             itemDesc.setText(item.get_ITEM_DESC());
             String trim = item.get_ITEM_LOCATION();
             int cutoff = trim.indexOf('_');
             itemRoom.setText(trim.substring(0, cutoff) + " -- Tap to see pin location");
+
+            // Update item values
+            item.inc_VIEW_CNT();
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy. hh:mm aaa");
+            String datetime = dateFormat.format(calendar.getTime());
+            item.set_ITEM_ACCESS(datetime);
+
+            database.updateItemInDB(item);
+
         }
     }
 }

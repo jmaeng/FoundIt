@@ -286,7 +286,8 @@ public class MainActivity extends AppCompatActivity
         Intent intent;
 
         if (id == R.id.nav_home) {
-            //TODO do nothing? Or go to home again?
+            intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);

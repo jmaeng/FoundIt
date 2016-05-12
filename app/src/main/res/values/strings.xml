@@ -26,6 +26,11 @@
     <string name="item_room_button">Select a room...</string>
     <string name="item_create_item">Create Item</string>
 
+
+    <!-- Create Room Activity -->
+    <string name="room_name_title">Room Name</string>
+
+
     <!-- Search Bar -->
     <string name="search_title">Search For An Item</string>
     <string name="search_hint">Search for an item</string>
@@ -37,9 +42,5 @@
     <string name="title_activity_main_item">MainItemActivity</string>
     <string name="main_item_desc_title">Description</string>
     <string name="main_item_room_title">Location</string>
-
-    <!-- Create Room Activity -->
-    <string name="room_name_title">Room Name</string>
-
 
 </resources>
