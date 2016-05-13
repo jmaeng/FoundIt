@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Found_It</string>
+    <string name="app_name">Found It</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -15,8 +15,8 @@
     <string name="title_activity_main_room">Current Room</string>
 
     <!-- buttons -->
-    <string name="create_room_button">Create Room</string>
-    <string name="title_activity_add_item">Create New Item</string>
+    <string name="create_room_button"> Create Room </string>
+    <string name="title_activity_add_item"> Create New Item </string>
 
     <!-- Add Item Activity -->
     <string name="item_name_title">Item Name</string>
