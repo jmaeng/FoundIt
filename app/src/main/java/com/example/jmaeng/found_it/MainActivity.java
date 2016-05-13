@@ -188,7 +188,15 @@ public class MainActivity extends AppCompatActivity
             final Item item = itemArray.get(position);
             holder.getImageView().setImageBitmap(item.getBitmap());
 
-            //onclick listener goes here too. //TODO
+            holder.getImageView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, MainItemActivity.class);
+                    intent.putExtra("itemName", item.get_ITEM_NAME());
+                    startActivity(intent);
+                }
+
+            });
         }
 
         @Override
@@ -289,14 +297,13 @@ public class MainActivity extends AppCompatActivity
         Intent intent;
 
         if (id == R.id.nav_home) {
-            //TODO do nothing? Or go to home again?
-
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {
-                //TODO
+            intent = new Intent(this, AllItemsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

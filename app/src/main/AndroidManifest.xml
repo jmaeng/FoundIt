@@ -19,9 +19,7 @@
     3) Contains the API libraries the app needs to be linked against
             (other than the Android framework APIs), such as the Google Maps library.
     -->
-
-   <!--  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
-
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -47,8 +45,8 @@
         <activity
             android:name=".AllRoomsActivity"
             android:label="@string/title_activity_all_room"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:largeHeap="true"/>
+            android:largeHeap="true"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CreateRoomActivity"
             android:label="@string/title_activity_create_room"
@@ -56,11 +54,19 @@
         <activity
             android:name=".MainRoomActivity"
             android:label="@string/title_activity_main_room"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:largeHeap="true"></activity>
+            android:largeHeap="true"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddItemActivity"
             android:label="@string/title_activity_add_item"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MainItemActivity"
+            android:label="@string/title_activity_main_item"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AllItemsActivity"
+            android:label="@string/title_activity_all_items"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

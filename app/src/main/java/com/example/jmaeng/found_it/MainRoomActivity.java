@@ -206,7 +206,8 @@ public class MainRoomActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {
-            //TODO
+            intent = new Intent(this, AllItemsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
