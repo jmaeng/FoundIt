@@ -50,12 +50,22 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:largeHeap="true"/>
         <activity
+            android:name=".AllItemsActivity"
+            android:label="@string/title_activity_all_items"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:largeHeap="true"/>
+        <activity
             android:name=".CreateRoomActivity"
             android:label="@string/title_activity_create_room"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainRoomActivity"
             android:label="@string/title_activity_main_room"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:largeHeap="true"></activity>
+        <activity
+            android:name=".MainItemActivity"
+            android:label="@string/title_activity_main_item"
             android:theme="@style/AppTheme.NoActionBar"
             android:largeHeap="true"></activity>
         <activity

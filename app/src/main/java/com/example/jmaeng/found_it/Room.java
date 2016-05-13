@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 /**
  * Created by Jmaeng on 4/22/2016.
  */
-public class Room implements FoundItComponent {
+public class Room {
     private String name;
     private byte[] image;
 
