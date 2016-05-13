@@ -4,7 +4,6 @@ package com.example.jmaeng.found_it;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -49,15 +48,17 @@ public class AllRoomsActivity extends AppCompatActivity
         mainDatabase = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(mainDatabase);
 
+        /** Dont need FAB here??
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show(); //TODO
+                Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                startActivity(intent);
             }
-        });
+        });\
+         */
 
         //Set up Create Room Button
         Button createRoomButton = (Button)findViewById(R.id.create_room_button);
@@ -78,65 +79,8 @@ public class AllRoomsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Obtain intents
-        Intent intent = getIntent();
-
     }
 
-    /*
-    ImageAdapter for all the images in the grid representing different rooms
-     */
-/*    public class ImageAdapter extends BaseAdapter {
-        private Context context;
-
-        public ImageAdapter(Context c) {
-            context = c;
-        }
-        @Override
-        public int getCount() {
-            return roomArray.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return roomArray.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-        //create new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            TextView textView;
-            View view;
-            Room room = roomArray.get(position);
-
-            if (convertView == null) {
-                LayoutInflater li = getLayoutInflater();
-                view = li.inflate(R.layout.room_view, null);
-                textView = (TextView)view.findViewById(R.id.room_name);
-                textView.setText(room.getName());
-                imageView = (ImageView)view.findViewById(R.id.room_image);
-                imageView.setImageBitmap(room.getBitmap());
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                view.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
-                view.setPadding(PADDING, PADDING, PADDING, PADDING);
-
-            } else {
-                view = convertView;
-            }
-
-            return view;
-        }
-    }*/
-
-    /*
-    AsyncTask class that will obtain info from the database about all the rooms and then set up the
-    gridview layout with all the obtained information
-     */
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
 
         @Override
@@ -181,7 +125,7 @@ public class AllRoomsActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
-                    intent.putExtra("roomName", room.getName());
+                    intent.putExtra("roomName", room.getName().toString());
                     startActivity(intent);
                 }
             });
@@ -202,7 +146,7 @@ public class AllRoomsActivity extends AppCompatActivity
                                 public void onClick(View view) {
                                     //add back to database
                                     mainDatabase.addNewRoomToDB(tempRoom);
-                                    roomArray.add(room);
+                                    roomArray.add(tempRoom);
                                     //refresh RecyclerView again
                                     notifyDataSetChanged();
                                 }
@@ -227,6 +171,7 @@ public class AllRoomsActivity extends AppCompatActivity
             private final TextView roomName;
             private final ImageView roomImage;
 
+
             public ViewHolder(View roomView) {
                 super(roomView);
                 roomName = (TextView) roomView.findViewById(R.id.room_name);
@@ -243,7 +188,6 @@ public class AllRoomsActivity extends AppCompatActivity
             public TextView getNameView(){
                 return roomName;
             }
-
         }
     }
 

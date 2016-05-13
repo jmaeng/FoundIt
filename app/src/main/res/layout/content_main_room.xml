@@ -12,6 +12,10 @@
     tools:context="com.example.jmaeng.found_it.MainRoomActivity"
     tools:showIn="@layout/app_bar_main_room">
 
+    <ImageView
+        android:id="@+id/main_room_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/main_room_text"
         android:layout_width="wrap_content"

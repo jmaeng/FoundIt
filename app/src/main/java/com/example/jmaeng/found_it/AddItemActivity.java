@@ -1,23 +1,21 @@
 package com.example.jmaeng.found_it;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -27,7 +25,6 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AddItemActivity extends AppCompatActivity
@@ -112,13 +109,8 @@ public class AddItemActivity extends AppCompatActivity
         roomField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                Intent callIntent = new Intent(this, _some_class_name_);
-                startActivity(callIntent);
-                */
-                //TODO send to room select + location select
-                Snackbar.make(v, "Call room select",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent allRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
+                startActivity(allRooms);
             }
         });
 
@@ -127,14 +119,21 @@ public class AddItemActivity extends AppCompatActivity
         finalizeItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!finalizeItemCreation())
+                Intent goToRooms;
+
+                if(!finalizeItemCreation()) {
                     Snackbar.make(v, "Item names must be unique.",
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                else
+                            Snackbar.LENGTH_LONG).show();
+                } else {
                     Snackbar.make(v, item.get_ITEM_NAME() + " successfully added.",
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            Snackbar.LENGTH_LONG).show();
+
+                    goToRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
+                    startActivity(goToRooms);
+                }
             }
         });
+
     }
 
     /* Handling the image chosen from the gallery */
