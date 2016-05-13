@@ -5,22 +5,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
@@ -40,11 +37,6 @@ public class AllRoomsActivity extends AppCompatActivity
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
     private static final int COLS = 2;
-    private RecyclerView allRoomRecyclerView;
-    private GridLayoutManager gridLayoutManager;
-    private RecyclerViewAdaptor allRoomAdapter;
-    private DownloadFromDB allRoomTask;
-    private static final String TAG = AllRoomsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +47,19 @@ public class AllRoomsActivity extends AppCompatActivity
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
-        //(new DownloadFromDB()).execute(mainDatabase);
+        (new DownloadFromDB()).execute(mainDatabase);
 
+        /** Dont need FAB here??
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show(); //TODO
+                Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                startActivity(intent);
             }
-        });
+        });\
+         */
 
         //Set up Create Room Button
         Button createRoomButton = (Button)findViewById(R.id.create_room_button);
@@ -87,20 +81,8 @@ public class AllRoomsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        allRoomRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
-        gridLayoutManager = new GridLayoutManager(AllRoomsActivity.this, COLS);
-        allRoomRecyclerView.setHasFixedSize(true);
-        allRoomRecyclerView.setLayoutManager(gridLayoutManager);
-
-        //Obtain intents
-        Intent intent = getIntent();
-
     }
 
-    /*
-    AsyncTask class that will obtain info from the database about all the rooms and then set up the
-    gridview layout with all the obtained information
-     */
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
 
         @Override
@@ -113,19 +95,18 @@ public class AllRoomsActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<Room> rooms) {
             roomArray = rooms;
-            if (allRoomAdapter == null) {
-                allRoomAdapter = new RecyclerViewAdaptor();
-                allRoomRecyclerView.setAdapter(allRoomAdapter);
-            } else {
-                allRoomAdapter.notifyDataSetChanged();
-            }
-
+            //gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
+            //TODO How is this really saving us resources if we inflate recycler view continuously?
+            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view); //this is returning null and I don't know why...
+            GridLayoutManager glm = new GridLayoutManager(AllRoomsActivity.this, COLS);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(glm);
+            recyclerView.setAdapter(new RecyclerViewAdaptor());
         }
     }
 
     //the Recycler Adaptor that will connect the room data to UI
     public class RecyclerViewAdaptor extends RecyclerView.Adapter<RecyclerViewAdaptor.ViewHolder> {
-
         public RecyclerViewAdaptor() {
 
         }
@@ -146,25 +127,52 @@ public class AllRoomsActivity extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
-                    intent.putExtra("roomName", room.getName());
+                    intent.putExtra("roomName", room.getName().toString());
                     startActivity(intent);
                 }
+            });
 
+            holder.getImageView().setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final Room tempRoom = mainDatabase.getRoomFromDB(room.getName());
+
+                    mainDatabase.deleteRoomFromDB(room);
+                    roomArray.remove(room);
+                    notifyDataSetChanged();
+
+                    Snackbar snackbar = Snackbar
+                            .make(v, room.getName() + " has been deleted", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    //add back to database
+                                    mainDatabase.addNewRoomToDB(tempRoom);
+                                    roomArray.add(tempRoom);
+                                    //refresh RecyclerView again
+                                    notifyDataSetChanged();
+                                }
+                            });
+                    snackbar.show();
+                    return true;
+                }
             });
         }
 
         @Override
-        public int getItemCount(){
-            if(roomArray != null)
+        public int getItemCount() {
+            if (roomArray != null)
                 return roomArray.size();
             return 0;
         }
+
 
         //setting up each view, which are inflated from room_view.xml
         public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView roomName;
             private final ImageView roomImage;
+
 
             public ViewHolder(View roomView) {
                 super(roomView);
@@ -182,7 +190,6 @@ public class AllRoomsActivity extends AppCompatActivity
             public TextView getNameView(){
                 return roomName;
             }
-
         }
     }
 
@@ -215,8 +222,8 @@ public class AllRoomsActivity extends AppCompatActivity
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+            return super.onOptionsItemSelected(item);
+        }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -229,37 +236,14 @@ public class AllRoomsActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_all_rooms) {
+            //TODO do nothing?
         } else if (id == R.id.nav_all_items) {
-            intent = new Intent(this, AllItemsActivity.class);
-            startActivity(intent);
+            //TODO
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "RESTARTING ALL ROOMS ACTIVITY"); //happens on back press
-        //have to requery the database to change all the carousels
-        allRoomTask = new DownloadFromDB();
-        allRoomTask.execute(mainDatabase);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "RESUMING ALL ROOMS ACTIVITY"); //happens on back press
-        //have to requery the database to change all the carousels
-        allRoomTask = new DownloadFromDB();
-        allRoomTask.execute(mainDatabase);
-    }
-
-    @Override
-    public void onStop(){
-        super.onStop();
-        allRoomTask.cancel(false);
-    }
 }
+
