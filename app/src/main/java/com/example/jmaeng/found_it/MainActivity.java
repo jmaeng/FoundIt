@@ -90,13 +90,13 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView.setLayoutManager(recentLM);
         lastCarouselRecView.setLayoutManager(lastLM);
 
-        popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
+        /*popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
         recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
         lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
         popCarouselTask.execute(mainDatabase);
         recentlyAddedCarouselTask.execute(mainDatabase);
-        lastViewCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);*/
 
     }
 
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity
                     popCarouselRecView.setAdapter(popCarouselAdapter);
 
                 } else {
-                    popCarouselAdapter.swap(itArray);
+                    popCarouselAdapter.notifyDataSetChanged();
                 }
 
             } else if (recyclerViewID == R.id.recently_added_recycler_carousel_view){
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
                     recentCarouselRecView.setAdapter(recentCarouselAdapter);
 
                 } else {
-                    recentCarouselAdapter.swap(itArray);
+                    recentCarouselAdapter.notifyDataSetChanged();
                 }
 
             } else {
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
                     lastCarouselRecView.setAdapter(lastCarouselAdapter);
 
                 } else {
-                    lastCarouselAdapter.swap(itArray);
+                    lastCarouselAdapter.notifyDataSetChanged();
                 }
             }
         }
@@ -189,18 +189,6 @@ public class MainActivity extends AppCompatActivity
             holder.getImageView().setImageBitmap(item.getBitmap());
 
             //onclick listener goes here too. //TODO
-        }
-
-        public void swap(ArrayList<Item> updatedItemList) {
-            if (itemArray != null) {
-                itemArray.clear();
-                itemArray.addAll(updatedItemList);
-            } else {
-                itemArray = updatedItemList;
-            }
-
-            if (!itemArray.equals(updatedItemList))
-                notifyDataSetChanged();
         }
 
         @Override

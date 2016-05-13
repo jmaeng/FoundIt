@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,6 +35,7 @@ public class MainRoomActivity extends AppCompatActivity
     private GridView gridView;
     private final static int THUMBNAIL_SIZE = 400;
     private final static int PADDING = 10;
+    private static final String TAG = MainRoomActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,8 @@ public class MainRoomActivity extends AppCompatActivity
             roomName = (String)b.get("roomName"); //got name of room we want to show that already exists
             getSupportActionBar().setTitle(roomName);
             // System.out.println("intent returns: " + roomName); //WHOO HOO IT WORKS!
+        } else {
+            Log.d(TAG, "RECIEVED AN INTENT WITHOUT A PROPER ROOMNAME VARIABLE");
         }
 
         //handle database actions
@@ -104,6 +108,7 @@ public class MainRoomActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<RoomFace> roomFaces) {
             roomFaceArray = roomFaces;
+            Log.d(TAG, "FOUND " + roomFaces.size() + " ROOM FACES");
             gridView.setAdapter(new ImageAdapter(MainRoomActivity.this));
         }
     }

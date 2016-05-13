@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -38,6 +39,11 @@ public class AllRoomsActivity extends AppCompatActivity
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
     private static final int COLS = 2;
+    private RecyclerView allRoomRecyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private RecyclerViewAdaptor allRoomAdapter;
+    private DownloadFromDB allRoomTask;
+    private static final String TAG = AllRoomsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +54,7 @@ public class AllRoomsActivity extends AppCompatActivity
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
-        (new DownloadFromDB()).execute(mainDatabase);
+        //(new DownloadFromDB()).execute(mainDatabase);
 
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -79,60 +85,15 @@ public class AllRoomsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        allRoomRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        gridLayoutManager = new GridLayoutManager(AllRoomsActivity.this, COLS);
+        allRoomRecyclerView.setHasFixedSize(true);
+        allRoomRecyclerView.setLayoutManager(gridLayoutManager);
+
         //Obtain intents
         Intent intent = getIntent();
 
     }
-
-    /*
-    ImageAdapter for all the images in the grid representing different rooms
-     */
-/*    public class ImageAdapter extends BaseAdapter {
-        private Context context;
-
-        public ImageAdapter(Context c) {
-            context = c;
-        }
-        @Override
-        public int getCount() {
-            return roomArray.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return roomArray.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-        //create new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            TextView textView;
-            View view;
-            Room room = roomArray.get(position);
-
-            if (convertView == null) {
-                LayoutInflater li = getLayoutInflater();
-                view = li.inflate(R.layout.room_view, null);
-                textView = (TextView)view.findViewById(R.id.room_name);
-                textView.setText(room.getName());
-                imageView = (ImageView)view.findViewById(R.id.room_image);
-                imageView.setImageBitmap(room.getBitmap());
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                view.setLayoutParams(new GridView.LayoutParams(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
-                view.setPadding(PADDING, PADDING, PADDING, PADDING);
-
-            } else {
-                view = convertView;
-            }
-
-            return view;
-        }
-    }*/
 
     /*
     AsyncTask class that will obtain info from the database about all the rooms and then set up the
@@ -150,13 +111,13 @@ public class AllRoomsActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<Room> rooms) {
             roomArray = rooms;
-            //gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
-            //TODO How is this really saving us resources if we inflate recycler view continuously?
-            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view); //this is returning null and I don't know why...
-            GridLayoutManager glm = new GridLayoutManager(AllRoomsActivity.this, COLS);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(glm);
-            recyclerView.setAdapter(new RecyclerViewAdaptor());
+            if (allRoomAdapter == null) {
+                allRoomAdapter = new RecyclerViewAdaptor();
+                allRoomRecyclerView.setAdapter(allRoomAdapter);
+            } else {
+                allRoomAdapter.notifyDataSetChanged();
+            }
+
         }
     }
 
@@ -196,7 +157,6 @@ public class AllRoomsActivity extends AppCompatActivity
                 return roomArray.size();
             return 0;
         }
-
 
         //setting up each view, which are inflated from room_view.xml
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -275,5 +235,29 @@ public class AllRoomsActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "RESTARTING ALL ROOMS ACTIVITY"); //happens on back press
+        //have to requery the database to change all the carousels
+        allRoomTask = new DownloadFromDB();
+        allRoomTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "RESUMING ALL ROOMS ACTIVITY"); //happens on back press
+        //have to requery the database to change all the carousels
+        allRoomTask = new DownloadFromDB();
+        allRoomTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        allRoomTask.cancel(false);
     }
 }
