@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -59,7 +58,7 @@ public class MainDB {
 
 
     //Using SQL to create tables
-     /*
+     /**
     ROOMS_TABLE  : Stores all the rooms individually
     room_name    : Name of the room (Primary Key)
     room_img     : Thumbnail image of the room (not the room face/wall)
@@ -71,7 +70,7 @@ public class MainDB {
                     + ") ;";
 
 
-    /*
+    /**
     FACES_TABLE  : Stores all room face information for specific rooms
     face_name    : Face/Wall for the associated image. Example: Kitchen_1, Kitchen_2, etc (Primary Key)
     face_room    : Room name associated with the face. Example: Kitchen for Kitchen_1
@@ -85,7 +84,7 @@ public class MainDB {
                     + ") ;";
 
 
-    /*
+    /**
     ITEMS_TABLE          : Stores information for all items stored in the database
     item_name           : Name of the stored item (primary key)
     item_desc           : Description of the item
@@ -116,7 +115,8 @@ public class MainDB {
     private static final String DROP_ROOM_FACES_TABLE = "DROP TABLE IF EXISTS " + FACES_TABLE;
     private static final String DROP_ITEMS_TABLE = "DROP TABLE IF EXISTS " + ITEMS_TABLE;
 
-    /*Inner class that obtains references to database and performs long-running operations of
+
+    /**Inner class that obtains references to database and performs long-running operations of
     * creating and updating the database only when needed and NOT during app startup
     *
         Helper Class that contains all the methods to perform database operations like
