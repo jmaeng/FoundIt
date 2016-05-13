@@ -63,6 +63,10 @@
         <activity
             android:name=".MainItemActivity"
             android:label="@string/title_activity_main_item"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AllItemsActivity"
+            android:label="@string/title_activity_all_items"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
