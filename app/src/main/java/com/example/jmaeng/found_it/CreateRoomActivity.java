@@ -202,6 +202,7 @@ public class CreateRoomActivity extends AppCompatActivity
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         //bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         return outputStream.toByteArray();
     }
 
@@ -236,6 +237,7 @@ public class CreateRoomActivity extends AppCompatActivity
                         mainDatabase.addNewRoomToDB(room);
                     }
                     RoomFace rf = new RoomFace(roomName + "_" + i, roomName, byteArray);
+                    Log.d(TAG, "ROOM FACE " + rf.getRoomFace() + " has image " + rf.getImage().length);
                     mainDatabase.addNewFaceToDB(rf);
 
                 } catch (IOException e) {
@@ -299,9 +301,8 @@ public class CreateRoomActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {
-
-            //TODO
-
+            intent = new Intent(this, AllItemsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

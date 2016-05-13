@@ -86,13 +86,13 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView.setLayoutManager(recentLM);
         lastCarouselRecView.setLayoutManager(lastLM);
 
-        popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
+        /*popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
         recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
         lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
 
         popCarouselTask.execute(mainDatabase);
         recentlyAddedCarouselTask.execute(mainDatabase);
-        lastViewCarouselTask.execute(mainDatabase);
+        lastViewCarouselTask.execute(mainDatabase);*/
 
     }
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity
                     popCarouselRecView.setAdapter(popCarouselAdapter);
 
                 } else {
-                    popCarouselAdapter.swap(itArray);
+                    popCarouselAdapter.notifyDataSetChanged();
                 }
 
             } else if (recyclerViewID == R.id.recently_added_recycler_carousel_view){
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity
                     recentCarouselRecView.setAdapter(recentCarouselAdapter);
 
                 } else {
-                    recentCarouselAdapter.swap(itArray);
+                    recentCarouselAdapter.notifyDataSetChanged();
                 }
 
             } else {
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity
                     lastCarouselRecView.setAdapter(lastCarouselAdapter);
 
                 } else {
-                    lastCarouselAdapter.swap(itArray);
+                    lastCarouselAdapter.notifyDataSetChanged();
                 }
             }
         }
@@ -184,19 +184,15 @@ public class MainActivity extends AppCompatActivity
             final Item item = itemArray.get(position);
             holder.getImageView().setImageBitmap(item.getBitmap());
 
-            //onclick listener goes here too. //TODO
-        }
+            holder.getImageView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, MainItemActivity.class);
+                    intent.putExtra("itemName", item.get_ITEM_NAME());
+                    startActivity(intent);
+                }
 
-        public void swap(ArrayList<Item> updatedItemList) {
-            if (itemArray != null) {
-                itemArray.clear();
-                itemArray.addAll(updatedItemList);
-            } else {
-                itemArray = updatedItemList;
-            }
-
-            if (!itemArray.equals(updatedItemList))
-                notifyDataSetChanged();
+            });
         }
 
         @Override
@@ -297,14 +293,13 @@ public class MainActivity extends AppCompatActivity
         Intent intent;
 
         if (id == R.id.nav_home) {
-            //TODO do nothing? Or go to home again?
-
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {
-                //TODO
+            intent = new Intent(this, AllItemsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

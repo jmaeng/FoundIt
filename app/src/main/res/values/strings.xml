@@ -29,6 +29,13 @@
 
     <!-- Create Room Activity -->
     <string name="room_name_title">Room Name</string>
+    <string name="title_activity_main_item">MainItemActivity</string>
 
+    <!-- Main Item Activity -->
+    <string name="mitem_desc_title">Description</string>
+    <string name="mitem_loc_title">Location</string>
+
+    <!-- All Items Activity -->
+    <string name="title_activity_all_items">All Items</string>
 
 </resources>

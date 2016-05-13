@@ -1,9 +1,10 @@
 package com.example.jmaeng.found_it;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 
-public class Item implements FoundItComponent {
+public class Item {
     /*
     Item table database to store all items.
     ITEM TABLE      : The table to store information for that item
@@ -152,4 +153,12 @@ public class Item implements FoundItComponent {
         return ITEM_BITMAP;
     }
 
+    public void inc_VIEW_CNT() {
+        this.ITEM_VIEW_CNT++;
+    }
+
+    public Bitmap testBitmap(){
+        Bitmap b = BitmapFactory.decodeByteArray(ITEM_IMG, 0, ITEM_IMG.length);
+        return b;
+    }
 }
