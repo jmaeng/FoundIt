@@ -188,7 +188,15 @@ public class MainActivity extends AppCompatActivity
             final Item item = itemArray.get(position);
             holder.getImageView().setImageBitmap(item.getBitmap());
 
-            //onclick listener goes here too. //TODO
+            holder.getImageView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, MainItemActivity.class);
+                    intent.putExtra("itemName", item.get_ITEM_NAME());
+                    startActivity(intent);
+                }
+
+            });
         }
 
         @Override
