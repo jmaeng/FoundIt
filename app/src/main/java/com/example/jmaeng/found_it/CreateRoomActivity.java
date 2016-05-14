@@ -240,6 +240,7 @@ public class CreateRoomActivity extends AppCompatActivity
                     mainDatabase.addNewFaceToDB(rf);
 
                 } catch (IOException e) {
+                    //Log.d(TAG, "CREATE ROOM LOOP FAILURE");
                     Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
                 }
             }

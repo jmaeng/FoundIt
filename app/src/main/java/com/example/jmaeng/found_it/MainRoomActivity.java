@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ public class MainRoomActivity extends AppCompatActivity
     private static final int PADDING = 10;
     private static final int COLS = 2;
     private String roomName;
+    private final static String TAG = MainRoomActivity.class.getSimpleName();
 
 
 
@@ -88,9 +90,9 @@ public class MainRoomActivity extends AppCompatActivity
 
         @Override
         protected  ArrayList<RoomFace> doInBackground(MainDB... params) {
-            if (getIntent() != null){
+            /*if (getIntent() != null){
                 roomName = getIntent().getStringExtra("roomName");
-            }
+            }*/
             MainDB db = params[0];
             //Query for all the images and put them in the images array I already created.
             return db.getRoomFaceImages(roomName);

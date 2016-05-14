@@ -42,8 +42,8 @@ public class MainDB {
     private static final String ROOM_IMG = "room_img";
 
     // Face Column Names
-    private static final String FACE_NAME = "face_name";
-    private static final String FACE_ROOM = "face_room";
+    private static final String FACE_NAME = "face_name"; //name of face
+    private static final String FACE_ROOM = "face_room"; //name of room that face belongs to
     private static final String FACE_IMG = "face_img";
 
     // Item Table Column Names
