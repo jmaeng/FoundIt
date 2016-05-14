@@ -109,7 +109,7 @@ public class AddItemActivity extends AppCompatActivity
         finalizeItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToRooms;
+                Intent goToRoom;
 
                 if(!finalizeItemCreation()) {
                     Snackbar.make(v, "Item names must be unique.",
@@ -118,8 +118,8 @@ public class AddItemActivity extends AppCompatActivity
                     Snackbar.make(v, item.get_ITEM_NAME() + " successfully added.",
                             Snackbar.LENGTH_LONG).show();
 
-                    goToRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
-                    startActivity(goToRooms);
+                    goToRoom = new Intent(getApplicationContext(), MainRoomActivity.class);
+                    startActivity(goToRoom);
                 }
             }
         });
