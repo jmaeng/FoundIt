@@ -41,6 +41,7 @@ public class AddItemActivity extends AppCompatActivity
     private Item item;
     private final static int PICK_IMAGE_REQUEST = 1;
     private byte[] itemImage;
+    private final static String TAG = AddItemActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +110,7 @@ public class AddItemActivity extends AppCompatActivity
         finalizeItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToRoom;
+                Intent goToItem;
 
                 if(!finalizeItemCreation()) {
                     Snackbar.make(v, "Item names must be unique.",
@@ -118,8 +119,11 @@ public class AddItemActivity extends AppCompatActivity
                     Snackbar.make(v, item.get_ITEM_NAME() + " successfully added.",
                             Snackbar.LENGTH_LONG).show();
 
-                    goToRoom = new Intent(getApplicationContext(), MainRoomActivity.class);
-                    startActivity(goToRoom);
+                    //TODO this needs to be fixed
+                    goToItem = new Intent(getApplicationContext(), MainItemActivity.class);
+                    Log.d(TAG, "Item sent to MainItemActivity is " + item.get_ITEM_NAME());
+                    goToItem.putExtra("itemName", item.get_ITEM_NAME());
+                    startActivity(goToItem);
                 }
             }
         });
@@ -223,7 +227,6 @@ public class AddItemActivity extends AppCompatActivity
         item.set_ITEM_LOCATION("some room"); //TODO
         item.set_ITEM_X(0); //TODO
         item.set_ITEM_Y(0); //TODO
-        item.set_ITEM_IMG(null); //TODO
 
         boolean success = database.addNewItemToDB(item);
         return success;
