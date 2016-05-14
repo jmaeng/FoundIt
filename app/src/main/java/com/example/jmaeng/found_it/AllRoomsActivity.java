@@ -14,8 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +40,7 @@ public class AllRoomsActivity extends AppCompatActivity
     private RecyclerViewAdaptor allRoomAdapter;
     private DownloadFromDB allRoomTask;
     private static final String TAG = AllRoomsActivity.class.getSimpleName();
+    private String pinActivityAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +89,6 @@ public class AllRoomsActivity extends AppCompatActivity
         gridLayoutManager = new GridLayoutManager(AllRoomsActivity.this, COLS);
         allRoomRecyclerView.setHasFixedSize(true);
         allRoomRecyclerView.setLayoutManager(gridLayoutManager);
-
-
     }
 
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
@@ -139,6 +136,15 @@ public class AllRoomsActivity extends AppCompatActivity
                 public void onClick(View view) {
                     Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
                     intent.putExtra("roomName", room.getName().toString());
+
+                    if (getIntent() != null) {
+                        if (getIntent().getExtras() != null) {
+                            if (getIntent().getExtras().get("action") != null) {
+                                intent.putExtra("action",getIntent().getExtras().getString("action"));
+                            }
+                        }
+                    }
+
                     startActivity(intent);
                 }
             });

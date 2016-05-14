@@ -3,9 +3,8 @@ package com.example.jmaeng.found_it;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -79,7 +79,7 @@ public class MainItemActivity extends AppCompatActivity
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        // Grab item name from intent
+        // Grab item name from intent -- might throw null pointerexception??
         if (bundle.containsKey("itemName")){
             itemName = (String)bundle.get("itemName");
             getSupportActionBar().setTitle(itemName);
@@ -87,6 +87,8 @@ public class MainItemActivity extends AppCompatActivity
 
         database = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(database);
+
+        itemObject = database.getItemFromDB(itemName);
     }
 
     @Override
@@ -117,6 +119,8 @@ public class MainItemActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_delete) {
+            database.deleteItemFromDB(itemObject);
+
             Intent intent = new Intent(this, AllItemsActivity.class);
             intent.putExtra("activity","mainItem");
             intent.putExtra("itemName", itemName);
@@ -139,6 +143,7 @@ public class MainItemActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
+            intent.putExtra("action","view");
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {
@@ -179,6 +184,23 @@ public class MainItemActivity extends AppCompatActivity
             item.set_ITEM_ACCESS(datetime);
 
             database.updateItemInDB(item);
+
+            itemRoom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainItemActivity.this, PinsActivity.class);
+                    intent.putExtra("action","view");
+                    intent.putExtra("itemName",itemName);
+
+                    Item i = database.getItemFromDB(itemName);
+                    String location = i.get_ITEM_LOCATION();
+                    RoomFace r = database.getFaceFromDB(location);
+
+                    intent.putExtra("image",r.getImage());
+
+                    startActivity(intent);
+                }
+            });
 
         }
     }

@@ -100,6 +100,7 @@ public class AddItemActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent allRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
+                allRooms.putExtra("action","place");
                 startActivity(allRooms);
             }
         });
@@ -119,6 +120,7 @@ public class AddItemActivity extends AppCompatActivity
                             Snackbar.LENGTH_LONG).show();
 
                     goToRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
+                    goToRooms.putExtra("action","view");
                     startActivity(goToRooms);
                 }
             }
@@ -189,6 +191,7 @@ public class AddItemActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
+            intent.putExtra("action","view");
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {

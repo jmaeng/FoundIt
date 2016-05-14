@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -293,6 +292,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
+            intent.putExtra("action","view");
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {

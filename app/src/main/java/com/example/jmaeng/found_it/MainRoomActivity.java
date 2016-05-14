@@ -30,7 +30,6 @@ public class MainRoomActivity extends AppCompatActivity
 
     private MainDB mainDatabase;
     private ArrayList<RoomFace> roomFacesArray;
-    private GridView gridView;
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
     private static final int COLS = 2;
@@ -63,13 +62,13 @@ public class MainRoomActivity extends AppCompatActivity
         /*roomName = getIntent().getStringExtra(roomName);*/
 
 
-         //Set up FAB button -- need a FAB button here -JM
+        //Set up FAB button -- need a FAB button here -JM
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
-            startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -129,7 +128,14 @@ public class MainRoomActivity extends AppCompatActivity
             holder.getImageView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                  //create intent that goes to image and pin dots..//TODO
+                    //Convert to byte array
+                    //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    //roomFace.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    Intent intent = new Intent(MainRoomActivity.this, PinsActivity.class);
+                    intent.putExtra("roomFaceName",roomFace.getRoomFace());
+                    intent.putExtra("image",roomFace.getImage());
+                    intent.putExtra("action", getIntent().getExtras().getString("action"));
+                    startActivity(intent);
                 }
             });
 
