@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -778,6 +779,7 @@ public class MainDB {
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    Log.d(TAG, "GOT ITEM " + name + " OF SIZE " + image.length);
                     toAdd.set_ITEM_NAME(name);
                     toAdd.set_ITEM_IMG(image);
                     itemArray.add(toAdd);
@@ -839,12 +841,14 @@ public class MainDB {
 
         if (recyclerViewID == R.id.recently_added_recycler_carousel_view) {
             targetField = ITEM_CREATED;
+            Log.d(TAG, "DOING ITEM CREATED IN DB");
         } else {
             //last viewed
             targetField = ITEM_LAST_ACCESS;
+            Log.d(TAG, "DOING ITEM LAST ACCESSED IN DB");
         }
         // SQL Query Construction
-        String query = "SELECT " + ITEM_NAME + ", " + ITEM_CREATED + ", " + ITEM_IMG +
+        String query = "SELECT " + ITEM_NAME + ", " + ITEM_CREATED + ", " + ITEM_IMG + ", " + targetField +
                 " FROM " + ITEMS_TABLE +
                 " ORDER BY " + "datetime(" + targetField + ")" + " COLLATE NOCASE DESC";
         Cursor c = sqlDB.rawQuery(query, null);
@@ -858,10 +862,13 @@ public class MainDB {
                 toAdd = new Item();
                 int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
                 int ITEM_IMAGE_INDEX = c.getColumnIndex(ITEM_IMG);
+                int ITEM_TIME_INDEX = c.getColumnIndex(targetField);
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
-                    //Log.d(TAG, "***** " + name + " ::: " + itemCreatedDateTime);
+                    String dateTime = c.getString(ITEM_TIME_INDEX);
+                    Log.d(TAG, "***** " + name + " ::: " + dateTime);
+
                     toAdd.set_ITEM_NAME(name);
                     toAdd.set_ITEM_IMG(image);
                     recentlyAddedOrLastViewedItemArray.add(toAdd);

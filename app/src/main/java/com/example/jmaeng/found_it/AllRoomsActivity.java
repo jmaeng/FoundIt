@@ -1,9 +1,10 @@
 package com.example.jmaeng.found_it;
 
-
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -13,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,14 +31,17 @@ import java.util.ArrayList;
 public class AllRoomsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //TODO NEED TO UPDATE ROOM GRIDVIEW, IF ROOM DATABASE CHANGES
-
     private MainDB mainDatabase;
     private ArrayList<Room> roomArray;
     private GridView gridView;
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
     private static final int COLS = 2;
+    private RecyclerView allRoomRecyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private RecyclerViewAdaptor allRoomAdapter;
+    private DownloadFromDB allRoomTask;
+    private static final String TAG = AllRoomsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +52,9 @@ public class AllRoomsActivity extends AppCompatActivity
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
-        (new DownloadFromDB()).execute(mainDatabase);
+        //(new DownloadFromDB()).execute(mainDatabase);
 
-        /** Dont need FAB here??
+
         //Set up FAB button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -57,11 +63,12 @@ public class AllRoomsActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
                 startActivity(intent);
             }
-        });\
-         */
+        });
+
 
         //Set up Create Room Button
         Button createRoomButton = (Button)findViewById(R.id.create_room_button);
+        createRoomButton.setBackgroundColor(Color.DKGRAY);
         createRoomButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -79,6 +86,12 @@ public class AllRoomsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        allRoomRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        gridLayoutManager = new GridLayoutManager(AllRoomsActivity.this, COLS);
+        allRoomRecyclerView.setHasFixedSize(true);
+        allRoomRecyclerView.setLayoutManager(gridLayoutManager);
+
+
     }
 
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Room>> {
@@ -93,18 +106,18 @@ public class AllRoomsActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<Room> rooms) {
             roomArray = rooms;
-            //gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
-            //TODO How is this really saving us resources if we inflate recycler view continuously?
-            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view); //this is returning null and I don't know why...
-            GridLayoutManager glm = new GridLayoutManager(AllRoomsActivity.this, COLS);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(glm);
-            recyclerView.setAdapter(new RecyclerViewAdaptor());
+            if (allRoomAdapter == null) {
+                allRoomAdapter = new RecyclerViewAdaptor();
+                allRoomRecyclerView.setAdapter(allRoomAdapter);
+            } else {
+                allRoomAdapter.notifyDataSetChanged();
+            }
         }
     }
 
     //the Recycler Adaptor that will connect the room data to UI
     public class RecyclerViewAdaptor extends RecyclerView.Adapter<RecyclerViewAdaptor.ViewHolder> {
+
         public RecyclerViewAdaptor() {
 
         }
@@ -163,7 +176,6 @@ public class AllRoomsActivity extends AppCompatActivity
                 return roomArray.size();
             return 0;
         }
-
 
         //setting up each view, which are inflated from room_view.xml
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -237,13 +249,34 @@ public class AllRoomsActivity extends AppCompatActivity
             //TODO do nothing?
         } else if (id == R.id.nav_all_items) {
             intent = new Intent(this, AllItemsActivity.class);
-            intent.putExtra("activity","allRooms");
             startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //have to requery the database to change all the carousels
+        allRoomTask = new DownloadFromDB();
+        allRoomTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //have to requery the database to change all the carousels
+        allRoomTask = new DownloadFromDB();
+        allRoomTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        allRoomTask.cancel(false);
     }
 }
 
