@@ -29,8 +29,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //TODO NEED TO TEST IF DATABASE UPDATES AFTER ITEM IS ADDED PROPERLY
-
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CAROUSEL_LIMIT = 8;
     private NavigationView navigationView;
@@ -86,14 +84,6 @@ public class MainActivity extends AppCompatActivity
         recentCarouselRecView.setLayoutManager(recentLM);
         lastCarouselRecView.setLayoutManager(lastLM);
 
-        /*popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
-        recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
-        lastViewCarouselTask = new DownloadFromDB(R.id.viewed_recycler_carousel_view);
-
-        popCarouselTask.execute(mainDatabase);
-        recentlyAddedCarouselTask.execute(mainDatabase);
-        lastViewCarouselTask.execute(mainDatabase);*/
-
     }
 
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<Item>> {
@@ -141,6 +131,7 @@ public class MainActivity extends AppCompatActivity
                     popCarouselRecView.setAdapter(popCarouselAdapter);
 
                 } else {
+                    popCarouselAdapter.setItemArray(itArray);
                     popCarouselAdapter.notifyDataSetChanged();
                 }
 
@@ -150,6 +141,7 @@ public class MainActivity extends AppCompatActivity
                     recentCarouselRecView.setAdapter(recentCarouselAdapter);
 
                 } else {
+                    recentCarouselAdapter.setItemArray(itArray);
                     recentCarouselAdapter.notifyDataSetChanged();
                 }
 
@@ -159,6 +151,7 @@ public class MainActivity extends AppCompatActivity
                     lastCarouselRecView.setAdapter(lastCarouselAdapter);
 
                 } else {
+                    lastCarouselAdapter.setItemArray(itArray);
                     lastCarouselAdapter.notifyDataSetChanged();
                 }
             }
@@ -200,6 +193,10 @@ public class MainActivity extends AppCompatActivity
            if (itemArray != null)
                 return itemArray.size();
             return 0;
+        }
+
+        public void setItemArray(ArrayList<Item> newItemArray) {
+            itemArray = newItemArray;
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {

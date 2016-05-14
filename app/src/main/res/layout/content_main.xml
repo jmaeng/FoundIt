@@ -23,7 +23,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Popular" />
+            android:text="Popular"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:padding="15dp"/>
 
         <android.support.v7.widget.RecyclerView
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -42,7 +45,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Recently Added" />
+            android:text="Recently Added"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:padding="15dp" />
 
         <android.support.v7.widget.RecyclerView
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -60,7 +66,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Last Viewed" />
+            android:text="Last Viewed"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:padding="15dp" />
 
         <android.support.v7.widget.RecyclerView
             xmlns:app="http://schemas.android.com/apk/res-auto"
