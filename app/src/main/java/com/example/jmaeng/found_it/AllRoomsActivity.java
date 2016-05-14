@@ -2,6 +2,7 @@ package com.example.jmaeng.found_it;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -62,6 +63,7 @@ public class AllRoomsActivity extends AppCompatActivity
 
         //Set up Create Room Button
         Button createRoomButton = (Button)findViewById(R.id.create_room_button);
+        createRoomButton.setBackgroundColor(Color.DKGRAY);
         createRoomButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
