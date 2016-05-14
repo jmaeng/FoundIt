@@ -18,7 +18,8 @@
         android:layout_height="300dp"
         android:id="@+id/main_item_image"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitCenter"/>
 
     <TextView
         android:layout_width="wrap_content"
