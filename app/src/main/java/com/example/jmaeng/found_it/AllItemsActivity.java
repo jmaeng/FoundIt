@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -35,6 +36,12 @@ public class AllItemsActivity extends AppCompatActivity
     private static final int PADDING = 10;
     private static final int COLS = 2;
 
+    private RecyclerView allItemRecyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private RecyclerViewAdaptor allItemAdapter;
+    private DownloadFromDB allItemTask;
+    private static final String TAG = AllItemsActivity.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,16 @@ public class AllItemsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Set up FAB button -- this activity needs one -JM
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                startActivity(intent);
+            }
+        });
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -58,6 +75,11 @@ public class AllItemsActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        allItemRecyclerView = (RecyclerView)findViewById(R.id.recycler_view_item);
+        gridLayoutManager = new GridLayoutManager(AllItemsActivity.this, COLS);
+        allItemRecyclerView.setHasFixedSize(true);
+        allItemRecyclerView.setLayoutManager(gridLayoutManager);
 
     }
 
@@ -132,11 +154,13 @@ public class AllItemsActivity extends AppCompatActivity
 
         protected void onPostExecute(final ArrayList<Item> items) {
             itemArray = items;
-            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view_item); //this is returning null and I don't know why...
-            GridLayoutManager glm = new GridLayoutManager(AllItemsActivity.this, COLS);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(glm);
-            recyclerView.setAdapter(new AllItemsActivity.RecyclerViewAdaptor());
+            Log.d(TAG, "RECEIVED " + itemArray.size() + "ITEMS");
+            if (allItemAdapter == null) {
+                allItemAdapter = new RecyclerViewAdaptor();
+                allItemRecyclerView.setAdapter(allItemAdapter);
+            } else {
+                allItemAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -202,6 +226,28 @@ public class AllItemsActivity extends AppCompatActivity
             }
 
         }
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //have to requery the database to change all the carousels
+        allItemTask = new DownloadFromDB();
+        allItemTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //have to requery the database to change all the carousels
+        allItemTask = new DownloadFromDB();
+        allItemTask.execute(mainDatabase);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        allItemTask.cancel(false);
     }
 
 }

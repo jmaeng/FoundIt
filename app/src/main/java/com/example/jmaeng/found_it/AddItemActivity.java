@@ -146,7 +146,7 @@ public class AddItemActivity extends AppCompatActivity
                     Uri mImageUri=data.getData();
                     Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mImageUri);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
 
                     item.set_ITEM_IMG(byteArray);
