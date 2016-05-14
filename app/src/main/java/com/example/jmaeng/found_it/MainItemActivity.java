@@ -23,7 +23,7 @@ public class MainItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private MainDB database;
-    private Item item;
+    private Item itemObject;
     private String itemName;
     private ImageView itemImage;
     private TextView itemDesc;
@@ -116,6 +116,11 @@ public class MainItemActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_delete) {
+            Intent intent = new Intent(this, AllItemsActivity.class);
+            intent.putExtra("activity","mainItem");
+            intent.putExtra("itemName", itemName);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -138,6 +143,8 @@ public class MainItemActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_all_items) {
             intent = new Intent(this, AllItemsActivity.class);
+            intent.putExtra("activity","mainItem");
+            intent.putExtra("itemName","none");
             startActivity(intent);
         }
 
@@ -150,10 +157,10 @@ public class MainItemActivity extends AppCompatActivity
 
         @Override
         protected  Item doInBackground(MainDB... params) {
-            item = database.getItemFromDB(itemName);
+            itemObject = database.getItemFromDB(itemName);
 
             //Query for all the images and put them in the images array I already created.
-            return item;
+            return itemObject;
         }
 
         protected void onPostExecute(Item item) {
