@@ -4,6 +4,7 @@ package com.example.jmaeng.found_it;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -27,8 +28,6 @@ import java.util.ArrayList;
 public class MainRoomActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //TODO NEED TO UPDATE ROOM GRIDVIEW, IF ROOM DATABASE CHANGES
-
     private MainDB mainDatabase;
     private ArrayList<RoomFace> roomFacesArray;
     private GridView gridView;
@@ -42,7 +41,7 @@ public class MainRoomActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_rooms);
+        setContentView(R.layout.activity_main_room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -50,19 +49,29 @@ public class MainRoomActivity extends AppCompatActivity
         mainDatabase = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(mainDatabase);
 
-        roomName = getIntent().getStringExtra(roomName);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
 
-        /** Dont need FAB here??
-         //Set up FAB button
-         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-         fab.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-        Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
-        startActivity(intent);
+        // Grab item name from intent
+        if (bundle.containsKey("roomName")){
+            roomName = (String)bundle.get("roomName");
+            getSupportActionBar().setTitle(roomName);
         }
-        });\
-         */
+
+        //This did not check for null and did not update the supportActionBar to be the name of
+        // the room. Which is why I got rid of it and put the original code in. - JM
+        /*roomName = getIntent().getStringExtra(roomName);*/
+
+
+         //Set up FAB button -- need a FAB button here -JM
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+            startActivity(intent);
+            }
+        });
 
         //Set up navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -91,9 +100,7 @@ public class MainRoomActivity extends AppCompatActivity
         //TODO right now it is showing all the rooms walls, when I want to just pick one of the walls and put a name on the image as well
         protected void onPostExecute(final ArrayList<RoomFace> roomFaces) {
             roomFacesArray = roomFaces;
-            //gridView.setAdapter(new ImageAdapter(AllRoomsActivity.this));
-            //TODO How is this really saving us resources if we inflate recycler view continuously?
-            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view); //this is returning null and I don't know why...
+            RecyclerView recyclerView = (RecyclerView)findViewById(R.id.main_room_recycler_view); //this is returning null and I don't know why...
             GridLayoutManager glm = new GridLayoutManager(MainRoomActivity.this, COLS);
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(glm);
@@ -122,7 +129,7 @@ public class MainRoomActivity extends AppCompatActivity
             holder.getImageView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                  //create intent that goes to image and pin dots..
+                  //create intent that goes to image and pin dots..//TODO
                 }
             });
 
@@ -231,7 +238,9 @@ public class MainRoomActivity extends AppCompatActivity
         } else if (id == R.id.nav_all_rooms) {
             //TODO do nothing?
         } else if (id == R.id.nav_all_items) {
-            //TODO
+            intent = new Intent(this, AllItemsActivity.class);
+            intent.putExtra("activity","mainRoom");
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
