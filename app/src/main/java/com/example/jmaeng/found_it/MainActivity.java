@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callAddItemActivity();
+                Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -319,7 +320,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestart(){
         super.onRestart();
-        Log.d(TAG, "RESTARTING MAIN ACTIVITY"); //happens on back press
         //have to requery the database to change all the carousels
         popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
         recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
@@ -333,7 +333,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume(){
         super.onResume();
-        Log.d(TAG, "RESUMING MAIN ACTIVITY"); //happens when onCreate is called too
         //have to requery the database to change all the carousels.
         popCarouselTask = new DownloadFromDB(R.id.pop_recycler_carousel_view);
         recentlyAddedCarouselTask =  new DownloadFromDB(R.id.recently_added_recycler_carousel_view);
@@ -348,9 +347,8 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mainDatabase.closeDB();
-    }
-
-    private void callAddItemActivity() {
-
+        popCarouselTask.cancel(false);
+        recentlyAddedCarouselTask.cancel(false);
+        lastViewCarouselTask.cancel(false);
     }
 }

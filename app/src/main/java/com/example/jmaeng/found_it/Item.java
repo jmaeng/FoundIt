@@ -150,6 +150,9 @@ public class Item {
     }
 
     public Bitmap getBitmap() {
+        if (ITEM_BITMAP == null) {
+            ITEM_BITMAP = BitmapFactory.decodeByteArray(ITEM_IMG, 0, ITEM_IMG.length);
+        }
         return ITEM_BITMAP;
     }
 
