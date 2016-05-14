@@ -92,7 +92,7 @@ public class MainDB {
     item_last_accessed  : When the item was last acceseds
     item_created       : When the item was added to the database FORMAT: SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     item_view_count     : Number of times the item was searched
-    item_location       : The room where the item is stored in
+    item_location       : The room face where the item is stored in
     item_x              : X-coordinate of where the item is on the image
     item_y              : Y-coordinate of where the item is on the image
     item_img            : Image of the item

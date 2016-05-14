@@ -69,7 +69,14 @@
         <activity
             android:name=".AddItemActivity"
             android:label="@string/title_activity_add_item"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask"/>
+        <activity
+            android:name=".PinsActivity"
+            android:label="@string/title_activity_pins"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask"></activity>
+
         <activity android:name=".SearchableActivity"
             android:label="@string/title_activity_searchable"
             android:theme="@style/AppTheme.NoActionBar"

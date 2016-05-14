@@ -3,6 +3,8 @@ package com.example.jmaeng.found_it;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * Created by Jmaeng on 4/23/2016.
  */
@@ -43,5 +45,13 @@ public class RoomFace {
     public Bitmap getBitmap(){
         Bitmap b = BitmapFactory.decodeByteArray(image, 0, image.length);
         return b;
+    }
+
+    public void setImage(Bitmap bmp) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        image = byteArray;
     }
 }

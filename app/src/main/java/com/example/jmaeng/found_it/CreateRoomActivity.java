@@ -92,6 +92,7 @@ public class CreateRoomActivity extends AppCompatActivity
                 if(finalizeRoomCreation()) {
                     Intent intent = new Intent(CreateRoomActivity.this, MainRoomActivity.class);
                     intent.putExtra("roomName", room.getName());
+                    intent.putExtra("action","view");
                     startActivity(intent);
                 }
             }
@@ -296,6 +297,7 @@ public class CreateRoomActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_all_rooms) {
             intent = new Intent(this, AllRoomsActivity.class);
+            intent.putExtra("action","view");
             startActivity(intent);
 
         } else if (id == R.id.nav_all_items) {

@@ -160,8 +160,8 @@ public class Item {
         this.ITEM_VIEW_CNT++;
     }
 
-    public Bitmap testBitmap(){
+    /*public Bitmap testBitmap(){
         Bitmap b = BitmapFactory.decodeByteArray(ITEM_IMG, 0, ITEM_IMG.length);
         return b;
-    }
+    }*/
 }

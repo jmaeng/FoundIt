@@ -37,6 +37,7 @@
 
     <!-- All Items Activity -->
     <string name="title_activity_all_items">All Items</string>
+    <string name="title_activity_pins">Pins</string>
 
     <!-- Search Activity -->
     <string name="action_search">Search Items</string>
