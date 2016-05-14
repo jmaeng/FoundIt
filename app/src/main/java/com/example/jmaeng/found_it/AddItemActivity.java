@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +32,7 @@ public class AddItemActivity extends AppCompatActivity
 
     private MainDB database;
     private EditText nameField;
-    private ImageButton imageField;
+    private ImageView imageField;
     private TextView dateField;
     private String datetime;
     private EditText descField;
@@ -69,26 +69,16 @@ public class AddItemActivity extends AppCompatActivity
         nameField = (EditText)findViewById(R.id.itemNameField);
 
         // Image //
-        imageField = (ImageButton)findViewById(R.id.itemImageButton);
+        imageField = (ImageView)findViewById(R.id.itemImageView);
         imageField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                Intent callIntent = new Intent(this, _some_class_name_);
-                startActivity(callIntent);
-                */
-                //Uploads from gallery and sets the item img to the uploaded photo.
-
-                //TODO Still doesn't set up the imageView for showing the actual photo of the item though.
-
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent,
                         "Select Picture"), PICK_IMAGE_REQUEST);
 
-                Snackbar.make(v, "Call image select",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -150,6 +140,10 @@ public class AddItemActivity extends AppCompatActivity
                     byte[] byteArray = stream.toByteArray();
 
                     item.set_ITEM_IMG(byteArray);
+
+                    //show picture in imageView
+                    imageField.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    imageField.setImageBitmap(bmp);
 
                 } catch (IOException e) {
                     Log.e("LOG_TAG", "Caught IOException: " + e.getMessage()); //Should never get here
