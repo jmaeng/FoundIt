@@ -950,7 +950,7 @@ System.out.println(find);
         // Query was empty
         if(c == null || c.getCount() == 0) {
             closeDB();
-            return null;
+            return nameArray;
         }
 
         int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);

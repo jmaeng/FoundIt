@@ -21,14 +21,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class SearchableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    String query;
-    ArrayList<String> results;
+    private TextView noResults;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +42,23 @@ public class SearchableActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
+        noResults = (TextView)findViewById(R.id.no_search_results);
+        mListView = (ListView)findViewById(R.id.listView);
+
         // Get results from DB
         MainDB db = MainDB.getInstance(getApplicationContext());
+        String query = "";
         Intent intent = getIntent();
 
         // Preform search for query in item names
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
-            (new DownloadFromDB()).execute(db);
+            getSupportActionBar().setTitle("Search Results For \"" + query + "\"");
+            (new DownloadFromDB(db, query)).execute();
         } else {
-            query = "";
-            results = new ArrayList<>();
+            getSupportActionBar().setTitle("Search Results For \"" + query + "\"");
+            displayResults(new ArrayList<String>());
         }
-        getSupportActionBar().setTitle("Search Results For \"" + query + "\"");
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -145,15 +153,47 @@ public class SearchableActivity extends AppCompatActivity
 
     private class DownloadFromDB extends AsyncTask<MainDB, Void, ArrayList<String>> {
 
+        private MainDB db;
+        private String query;
+
+        public DownloadFromDB(MainDB db, String query) {
+            this.db = db;
+            this.query = query;
+        }
+
         @Override
         protected  ArrayList<String> doInBackground(MainDB... params) {
-            MainDB db = params[0];
             return db.getAllItemLikeNames(query);
         }
 
-        protected void onPostExecute(final ArrayList<String> items) {
-            //TODO
-            System.out.println(items.toString());
+        protected void onPostExecute(final ArrayList<String> results) {
+            Log.d(SearchableActivity.class.getSimpleName(),
+                    "[SearchableActivity]: Search for \'" + query + "\' " + results.toString());
+            displayResults(results);
         }
     }
+
+    private void displayResults(ArrayList<String> itemsFound) {
+        if(itemsFound.isEmpty()) {
+            noResults.setText("Nothing found.");
+            return;
+        }
+
+        final ArrayList<String> results = itemsFound;
+        ArrayAdapter<String> itemAdapter = new ArrayAdapter<>(this, R.layout.search_list, results);
+        mListView.setAdapter(itemAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int itemPos = position;
+                String itemName = (String)mListView.getItemAtPosition(position);
+                Intent intent = new Intent(getApplicationContext(), MainItemActivity.class);
+                intent.putExtra("itemName", results.get(position));
+                startActivity(intent);
+            }
+        });
+    }
+
+
 }
