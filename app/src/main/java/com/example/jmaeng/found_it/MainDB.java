@@ -779,6 +779,7 @@ public class MainDB {
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
+                    Log.d(TAG, "GOT ITEM " + name + " OF SIZE " + image.length);
                     toAdd.set_ITEM_NAME(name);
                     toAdd.set_ITEM_IMG(image);
                     itemArray.add(toAdd);
