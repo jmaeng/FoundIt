@@ -929,4 +929,42 @@ public class MainDB {
         closeDB();
         return itemArray;
     }
+
+    public ArrayList<String> getAllItemLikeNames(String find) {
+        openReadableDB();
+        ArrayList<String> nameArray = new ArrayList<String>();
+System.out.println(find);
+        // No reason to search for empty string
+        if(find.equals("")) {
+            closeDB();
+            return nameArray;
+        }
+
+        // SQL Query Construction
+        String query = "SELECT " + ITEM_NAME +
+                " FROM " + ITEMS_TABLE +
+                " WHERE " + ITEM_NAME + " LIKE " + "\'%" + find + "%\' COLLATE NOCASE " +
+                " ORDER BY " + ITEM_NAME + " COLLATE NOCASE ASC";
+        Cursor c = sqlDB.rawQuery(query, null);
+
+        // Query was empty
+        if(c == null || c.getCount() == 0) {
+            closeDB();
+            return nameArray;
+        }
+
+        int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+        // Gather all rooms
+        c.moveToFirst();
+        for (int i = 0; i < c.getCount(); i++) {
+            if (!c.isNull(ITEM_NAME_INDEX)) {
+                nameArray.add(c.getString(ITEM_NAME_INDEX));
+            }
+            c.moveToNext();
+        }
+
+        c.close();
+        closeDB();
+        return nameArray;
+    }
 }
