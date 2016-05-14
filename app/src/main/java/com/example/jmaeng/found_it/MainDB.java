@@ -394,7 +394,7 @@ public class MainDB {
 
         // Create an entity to add to the database
         ContentValues cv = new ContentValues();
-        cv.put(FACE_ROOM, face.getRoomFace());
+        cv.put(FACE_ROOM, face.getRoomName());
         cv.put(FACE_IMG, face.getImage());
 
         // Update face in database

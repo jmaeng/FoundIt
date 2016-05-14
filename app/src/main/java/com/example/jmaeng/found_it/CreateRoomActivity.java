@@ -236,7 +236,7 @@ public class CreateRoomActivity extends AppCompatActivity
                         mainDatabase.addNewRoomToDB(room);
                     }
                     RoomFace rf = new RoomFace(roomName + "_" + i, roomName, byteArray);
-                    Log.d(TAG, "ROOM FACE " + rf.getRoomFace() + " has image " + rf.getImage().length);
+                    //Log.d(TAG, "ROOM FACE " + rf.getRoomFace() + " has image " + rf.getImage().length);
                     mainDatabase.addNewFaceToDB(rf);
 
                 } catch (IOException e) {
