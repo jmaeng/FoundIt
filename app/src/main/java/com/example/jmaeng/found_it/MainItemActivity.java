@@ -170,11 +170,13 @@ public class MainItemActivity extends AppCompatActivity
 
         protected void onPostExecute(Item item) {
             // Update activity display
-            itemImage.setImageBitmap(item.testBitmap()); //TODO is there a better way to display images?
+            itemImage.setImageBitmap(item.getBitmap());
             itemDesc.setText(item.get_ITEM_DESC());
             String trim = item.get_ITEM_LOCATION();
-            int cutoff = trim.indexOf('_');
-            itemRoom.setText(trim.substring(0, cutoff) + " -- Tap to see pin location");
+            if (trim.contains("_")) {
+                int cutoff = trim.indexOf('_');
+                itemRoom.setText(trim.substring(0, cutoff) + " -- Tap to see pin location");
+            }
 
             // Update item values
             item.inc_VIEW_CNT();

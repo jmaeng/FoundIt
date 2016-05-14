@@ -1,5 +1,8 @@
 package com.example.jmaeng.found_it;
 
+//import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,9 +24,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SearchView;
+//import android.widget.SearchView;
 
 import java.util.ArrayList;
+import android.app.SearchManager;
+import android.widget.SearchView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -249,6 +254,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        /*
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -256,6 +262,19 @@ public class MainActivity extends AppCompatActivity
 
         //Configure the search info and add any event listeners here
         //TODO
+
+        return super.onCreateOptionsMenu(menu);
+        */
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        android.support.v7.widget.SearchView searchView = (
+                android.support.v7.widget.SearchView)MenuItemCompat.getActionView(searchItem);
+
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        ComponentName componentName = new ComponentName(this, SearchableActivity.class);
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 
         return super.onCreateOptionsMenu(menu);
     }
