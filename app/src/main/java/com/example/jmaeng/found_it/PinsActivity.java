@@ -83,7 +83,8 @@ public class PinsActivity extends AppCompatActivity
 
         Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
 
-        final  Paint paint = new Paint();
+
+        final Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(Color.MAGENTA);
 
@@ -91,9 +92,8 @@ public class PinsActivity extends AppCompatActivity
         int w = metrics.widthPixels;
         int h = metrics.heightPixels;
 
-        Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
-        final Bitmap mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
+        //Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
+        final Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         final Canvas canvas = new Canvas(mutableBitmap);
         canvas.setBitmap(mutableBitmap);
@@ -103,7 +103,6 @@ public class PinsActivity extends AppCompatActivity
         imageView.setImageBitmap(mutableBitmap);
 
         getSupportActionBar().setTitle(roomFaceTitle);
-
 
         if (action.equals("place")) {
             roomFaceImage.setOnTouchListener(new View.OnTouchListener() {
@@ -116,8 +115,8 @@ public class PinsActivity extends AppCompatActivity
                             imageView.invalidate();
                         case MotionEvent.ACTION_UP:
                             RoomFace rf = mainDatabase.getFaceFromDB(roomFaceTitle);
-                            mainDatabase.updateFaceInDB(rf);
                             rf.setImage(mutableBitmap);
+                            mainDatabase.updateFaceInDB(rf);
 
                             Intent intent = new Intent(PinsActivity.this, AddItemActivity.class);
                             startActivity(intent);
