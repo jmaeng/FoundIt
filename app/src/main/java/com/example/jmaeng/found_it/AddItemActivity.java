@@ -199,6 +199,7 @@ public class AddItemActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_all_items) {
             intent = new Intent(this, AllItemsActivity.class);
+            intent.putExtra("activity", "addItem");
             startActivity(intent);
         }
 
