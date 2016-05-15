@@ -243,29 +243,32 @@ public class PinsActivity extends AppCompatActivity
 
         protected void onPostExecute(final ArrayList<Item> itArray) {
             //what to do with alls the items in this room face?
-            Log.d(TAG, "FOUND " + itArray.size() + " ITEMS IN THIS ROOM FACE");
-            roomFaceImage.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    final int action = event.getAction();
-                    final float x = event.getX();
-                    final float y = event.getY();
-                    switch(action) {
-                        case MotionEvent.ACTION_UP :
-                            Item i;
-                            Item foundItem = getItemWithXandY(itArray, x, y);
-                            if (foundItem != null) {
-                                Intent sendingIntent = new Intent(PinsActivity.this, MainItemActivity.class);
-                                sendingIntent.putExtra("itemName", foundItem.get_ITEM_NAME());
-                                startActivity(sendingIntent);
-                            } else {
-                                Toast toast = Toast.makeText(getApplicationContext(), "No Item in that Spot!", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
+            //Log.d(TAG, "FOUND " + itArray.size() + " ITEMS IN THIS ROOM FACE");
+            if (itArray != null) {
+                roomFaceImage.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        final int action = event.getAction();
+                        final float x = event.getX();
+                        final float y = event.getY();
+                        switch(action) {
+                            case MotionEvent.ACTION_UP :
+                                Item i;
+                                Item foundItem = getItemWithXandY(itArray, x, y);
+                                if (foundItem != null) {
+                                    Intent sendingIntent = new Intent(PinsActivity.this, MainItemActivity.class);
+                                    sendingIntent.putExtra("itemName", foundItem.get_ITEM_NAME());
+                                    startActivity(sendingIntent);
+                                } else {
+                                    Toast toast = Toast.makeText(getApplicationContext(), "No Item in that Spot!", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                }
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            });
+                });
+            }
+
         }
     }
 
