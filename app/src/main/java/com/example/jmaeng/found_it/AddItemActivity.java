@@ -40,6 +40,7 @@ public class AddItemActivity extends AppCompatActivity
     private Button finalizeItem;
     private Item item;
     private final static int PICK_IMAGE_REQUEST = 1;
+    private final static int ADD_ITEM_REQUEST_CODE = 2;
     private byte[] itemImage;
     private final static String TAG = AddItemActivity.class.getSimpleName();
 
@@ -69,7 +70,7 @@ public class AddItemActivity extends AppCompatActivity
         // Name //
         nameField = (EditText)findViewById(R.id.itemNameField);
 
-        // Image //
+        // Image Button Click Set up and Action //
         imageField = (ImageView)findViewById(R.id.itemImageView);
         imageField.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,9 +101,14 @@ public class AddItemActivity extends AppCompatActivity
         roomField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent allRooms = new Intent(getApplicationContext(), AllRoomsActivity.class);
-                allRooms.putExtra("action","place");
-                startActivity(allRooms);
+                /* Send an intent with the item object to All Rooms Activity and then receive
+                changed item object back*/
+                Intent allRoomsIntent = new Intent(getApplicationContext(), AllRoomsActivity.class);
+                /*allRooms.putExtra("action","place");
+                startActivity(allRooms);*/
+                allRoomsIntent.putExtra("AddItemRequest", ADD_ITEM_REQUEST_CODE);
+                startActivityForResult(allRoomsIntent, ADD_ITEM_REQUEST_CODE);
+
             }
         });
 
@@ -130,8 +136,9 @@ public class AddItemActivity extends AppCompatActivity
 
     }
 
-    /* Handling the image chosen from the gallery */
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        /* Handling the image chosen from the gallery */
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
 
             if(data.getData() != null){
@@ -155,6 +162,14 @@ public class AddItemActivity extends AppCompatActivity
             } else {
                 Toast toast = Toast.makeText(getApplicationContext(), "Please pick an Item Image", Toast.LENGTH_SHORT);
             }
+        } else if (requestCode == ADD_ITEM_REQUEST_CODE && resultCode == RESULT_OK && data != null ) {
+            Log.d(TAG, "RECEIVED ADD ITEM INTENT FROM ALL ROOMS ACTIVITY");
+            item.set_ITEM_LOCATION(data.getStringExtra("RoomFaceName"));
+            item.set_ITEM_X(data.getFloatExtra("X_coord", 0));
+            item.set_ITEM_Y(data.getFloatExtra("Y_coord", 0));
+            Log.d(TAG, "Got item with x and y of : " + item.get_ITEM_X() + " "  + item.get_ITEM_Y());
+        } {
+
         }
     }
 
@@ -225,9 +240,6 @@ public class AddItemActivity extends AppCompatActivity
         item.set_ITEM_ACCESS(datetime);
         item.set_ITEM_CREATED(datetime);
         item.set_ITEM_VIEW_CNT(0);
-        item.set_ITEM_LOCATION("some room"); //TODO
-        item.set_ITEM_X(0); //TODO
-        item.set_ITEM_Y(0); //TODO
 
         boolean success = database.addNewItemToDB(item);
         return success;

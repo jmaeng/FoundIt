@@ -154,8 +154,8 @@ public class MainDB {
     // Singleton object of this class
     private static MainDB mainDBInstance;
     // DBHelper variables
-    private DBHelper dbHelper;
-    private SQLiteDatabase sqlDB;
+    private static DBHelper dbHelper;
+    private static SQLiteDatabase sqlDB;
 
 
     /**
@@ -182,7 +182,7 @@ public class MainDB {
     /**
      * Uses DBHelper to create access to read the database.
      */
-    protected void openReadableDB() {
+    protected synchronized void openReadableDB() {
         sqlDB = dbHelper.getReadableDatabase();
     }
 
@@ -190,7 +190,7 @@ public class MainDB {
     /**
      * Uses DBHelper to create access to write to the database
      */
-    protected void openWritableDB() {
+    protected synchronized void openWritableDB() {
         sqlDB = dbHelper.getWritableDatabase();
     }
 
@@ -198,7 +198,7 @@ public class MainDB {
     /**
      * Closes the database access
      */
-    protected void closeDB() {
+    protected synchronized void closeDB() {
         if (sqlDB != null)
             sqlDB.close();
     }
@@ -388,7 +388,7 @@ public class MainDB {
      * @param face Room face to change.
      * @return True if successful, otherwise false.
      */
-    public boolean updateFaceInDB(RoomFace face) {
+    public synchronized boolean updateFaceInDB(RoomFace face) {
         // Open writable access to database
         openWritableDB();
 
@@ -414,7 +414,7 @@ public class MainDB {
      * @param face_name The room face's name to search for
      * @return RoomFace object that stores all the information or null if roomface doesn't exist
      */
-    public RoomFace getFaceFromDB(String face_name) { //This method is right and should return null -JM
+    public synchronized RoomFace getFaceFromDB(String face_name) { //This method is right and should return null -JM
         openReadableDB();
         RoomFace face;
 
@@ -551,7 +551,7 @@ public class MainDB {
      * @param item_name The item's name to search for
      * @return Item object that stores all the information, or null if item doesn't exist
      */
-    public Item getItemFromDB(String item_name) { //This method is right and should return null -JM
+    public synchronized Item getItemFromDB(String item_name) { //This method is right and should return null -JM
         openReadableDB();
         Item item;
 
@@ -589,6 +589,45 @@ public class MainDB {
         c.close();
         closeDB();
         return item;
+    }
+
+    public synchronized ArrayList<Item> getAllItemsInRoomFaceFromDB(String room_face_name) { //This method is right and should return null -JM
+        openReadableDB();
+        Item item;
+
+        String query = "SELECT " + ITEM_NAME + ", " + ITEM_LOCATION + ", " +  ITEM_X + ", "
+                + ITEM_Y +  " FROM " + ITEMS_TABLE +
+                " WHERE " + ITEM_LOCATION + "=\'" + room_face_name + "\'";
+        Cursor c = sqlDB.rawQuery(query, null);
+        if(c == null || c.getCount() == 0) {
+            closeDB();
+            return null;
+        }
+
+        ArrayList<Item> itemArray = new ArrayList<Item>();
+        int ITEM_NAME_INDEX = c.getColumnIndex(ITEM_NAME);
+        int ITEM_LOCATION_INDEX = c.getColumnIndex(ITEM_LOCATION);
+        int ITEM_X_INDEX = c.getColumnIndex(ITEM_X);
+        int ITEM_Y_INDEX = c.getColumnIndex(ITEM_Y);
+
+        // Move to start of query result
+        if(c != null) {
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                item = new Item();
+                item.set_ITEM_NAME(c.getString(ITEM_NAME_INDEX));
+                item.set_ITEM_LOCATION(c.getString(ITEM_LOCATION_INDEX));
+                item.set_ITEM_X(c.getFloat(ITEM_X_INDEX));
+                item.set_ITEM_Y(c.getFloat(ITEM_Y_INDEX));
+                itemArray.add(item);
+                c.moveToNext();
+            }
+            c.close();
+        }
+
+        c.close();
+        closeDB();
+        return itemArray;
     }
 
     /**
@@ -685,7 +724,7 @@ public class MainDB {
      * @param roomName Room to get faces for
      * @return ArrayList of all RoomFace objects related to roomName
      */
-    public ArrayList<RoomFace> getRoomFaceImages(String roomName) { //DO NOT MODIFY -JM
+    public synchronized ArrayList<RoomFace> getRoomFaceImages(String roomName) { //DO NOT MODIFY -JM
         openReadableDB();
         ArrayList<RoomFace> roomFaces = new ArrayList<RoomFace>();
 
@@ -779,7 +818,7 @@ public class MainDB {
                 if (!c.isNull(ITEM_IMAGE_INDEX)) {
                     String name = c.getString(ITEM_NAME_INDEX);
                     byte[] image = c.getBlob(ITEM_IMAGE_INDEX);
-                    Log.d(TAG, "GOT ITEM " + name + " OF SIZE " + image.length);
+                    //Log.d(TAG, "GOT ITEM " + name + " OF SIZE " + image.length);
                     toAdd.set_ITEM_NAME(name);
                     toAdd.set_ITEM_IMG(image);
                     itemArray.add(toAdd);

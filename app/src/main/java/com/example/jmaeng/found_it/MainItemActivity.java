@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ public class MainItemActivity extends AppCompatActivity
     private ImageView itemImage;
     private TextView itemDesc;
     private TextView itemRoom;
+    private static final String TAG = MainItemActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +53,10 @@ public class MainItemActivity extends AppCompatActivity
         itemRoom = (TextView)findViewById(R.id.main_item_room);
 
         // Click on room to display pin location
-        itemRoom.setOnClickListener(new View.OnClickListener() {
+       /* itemRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
+                *//*
                 Intent callIntent = new Intent(this, _some_class_name_);
                 callIntent.putExtra("pinLocation", item);
                 startActivity(callIntent);
@@ -68,12 +70,12 @@ public class MainItemActivity extends AppCompatActivity
                     item = (Item)bundle.get("pinLocation");
                     getSupportActionBar().setTitle(item.get_ITEM_NAME() + " Location");
                 }
-                */
-                //TODO link to pin location activity
-                Snackbar.make(v, "Show pin location on face image",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                *//*
+                Intent intent = new Intent(MainItemActivity.this, PinsActivity.class);
+                intent.putExtra("roomFaceName", itemObject.get_ITEM_LOCATION());
+                startActivity(intent);
             }
-        });
+        });*/
 
 
         Intent intent = getIntent();
@@ -88,7 +90,7 @@ public class MainItemActivity extends AppCompatActivity
         database = MainDB.getInstance(getApplicationContext());
         (new DownloadFromDB()).execute(database);
 
-        itemObject = database.getItemFromDB(itemName);
+        //itemObject = database.getItemFromDB(itemName); redundant code
     }
 
     @Override
@@ -169,6 +171,17 @@ public class MainItemActivity extends AppCompatActivity
         }
 
         protected void onPostExecute(Item item) {
+
+            itemRoom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainItemActivity.this, PinsActivity.class);
+                    intent.putExtra("roomFaceName", itemObject.get_ITEM_LOCATION());
+                    Log.d(TAG, "ROOM FACE" + itemObject.get_ITEM_LOCATION());
+                    startActivity(intent);
+                }
+            });
+
             // Update activity display
             itemImage.setImageBitmap(item.getBitmap());
             itemDesc.setText(item.get_ITEM_DESC());
@@ -187,22 +200,7 @@ public class MainItemActivity extends AppCompatActivity
 
             database.updateItemInDB(item);
 
-            itemRoom.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainItemActivity.this, PinsActivity.class);
-                    intent.putExtra("action","view");
-                    intent.putExtra("itemName",itemName);
 
-                    Item i = database.getItemFromDB(itemName);
-                    String location = i.get_ITEM_LOCATION();
-                    RoomFace r = database.getFaceFromDB(location);
-
-                    intent.putExtra("image",r.getImage());
-
-                    startActivity(intent);
-                }
-            });
 
         }
     }

@@ -3,8 +3,10 @@ package com.example.jmaeng.found_it;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.Serializable;
 
-public class Item {
+
+public class Item implements Serializable {
     /*
     Item table database to store all items.
     ITEM TABLE      : The table to store information for that item
@@ -24,8 +26,8 @@ public class Item {
     private String ITEM_CREATED;
     private int ITEM_VIEW_CNT;
     private String ITEM_LOCATION;
-    private int ITEM_X;
-    private int ITEM_Y;
+    private float ITEM_X;
+    private float ITEM_Y;
     private byte[] ITEM_IMG;
     private Bitmap ITEM_BITMAP;
 
@@ -118,19 +120,19 @@ public class Item {
         return this.ITEM_LOCATION;
     }
 
-    public void set_ITEM_X(int x) {
+    public void set_ITEM_X(float x) {
         this.ITEM_X = x;
     }
 
-    public int get_ITEM_X() {
+    public float get_ITEM_X() {
         return this.ITEM_X;
     }
 
-    public void set_ITEM_Y(int y) {
+    public void set_ITEM_Y(float y) {
         this.ITEM_Y = y;
     }
 
-    public int get_ITEM_Y() {
+    public float get_ITEM_Y() {
         return this.ITEM_Y;
     }
 

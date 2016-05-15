@@ -32,7 +32,6 @@ public class AllRoomsActivity extends AppCompatActivity
 
     private MainDB mainDatabase;
     private ArrayList<Room> roomArray;
-    private GridView gridView;
     private static final int THUMBNAIL_SIZE = 400;
     private static final int PADDING = 10;
     private static final int COLS = 2;
@@ -41,7 +40,7 @@ public class AllRoomsActivity extends AppCompatActivity
     private RecyclerViewAdaptor allRoomAdapter;
     private DownloadFromDB allRoomTask;
     private static final String TAG = AllRoomsActivity.class.getSimpleName();
-    private String pinActivityAction;
+    private Intent receivedIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,21 +131,27 @@ public class AllRoomsActivity extends AppCompatActivity
             holder.getImageView().setImageBitmap(room.getBitmap());
             holder.getNameView().setText(room.getName());
 
+            /* OncClickListener when user clicks room face image */
             holder.getImageView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    receivedIntent = getIntent();
+                    //this is the intent this activity want tot send to MainRoomActivity
                     Intent intent = new Intent(AllRoomsActivity.this, MainRoomActivity.class);
-                    intent.putExtra("roomName", room.getName().toString());
+                    intent.putExtra("roomName", room.getName());
 
-                    if (getIntent() != null) {
-                        if (getIntent().getExtras() != null) {
-                            if (getIntent().getExtras().get("action") != null) {
-                                intent.putExtra("action",getIntent().getExtras().getString("action"));
-                            }
+                    /* Receiving intent from Add Item Activity */
+                    if (receivedIntent != null) {
+                        if (receivedIntent.hasExtra("AddItemRequest")) {
+                            Log.d(TAG, "IN ALL ROOMS -- GOING TO MAIN ROOM");
+                            intent.putExtra("AddItemRequest", (int)receivedIntent.getExtras().get("AddItemRequest"));
+                            startActivityForResult(intent, (int)receivedIntent.getExtras().get("AddItemRequest"));
+
+                        } else {
+                        /* Do this if receiving an intent from any other activity */
+                            startActivity(intent);
                         }
                     }
-
-                    startActivity(intent);
                 }
             });
 
@@ -206,6 +211,17 @@ public class AllRoomsActivity extends AppCompatActivity
 
             public TextView getNameView(){
                 return roomName;
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == (int)receivedIntent.getExtras().get("AddItemRequest")) {
+            Log.d(TAG, "RECEIVED ADD ITEM INTENT FROM MAIN ROOM ACTIVITY");
+            if (resultCode == RESULT_OK) {
+                setResult(RESULT_OK, data);
+                finish();
             }
         }
     }

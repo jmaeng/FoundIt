@@ -36,6 +36,7 @@ public class MainRoomActivity extends AppCompatActivity
     private static final int COLS = 2;
     private String roomName;
     private final static String TAG = MainRoomActivity.class.getSimpleName();
+    private Intent receivedIntent;
 
 
 
@@ -48,16 +49,18 @@ public class MainRoomActivity extends AppCompatActivity
 
         //get info from DB for this activity
         mainDatabase = MainDB.getInstance(getApplicationContext());
-        (new DownloadFromDB()).execute(mainDatabase);
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
 
+        receivedIntent = getIntent();
+        Bundle bundle = receivedIntent.getExtras();
         // Grab item name from intent
         if (bundle.containsKey("roomName")){
             roomName = (String)bundle.get("roomName");
             getSupportActionBar().setTitle(roomName);
         }
+
+        (new DownloadFromDB()).execute(mainDatabase);
+
 
         //This did not check for null and did not update the supportActionBar to be the name of
         // the room. Which is why I got rid of it and put the original code in. - JM
@@ -127,20 +130,31 @@ public class MainRoomActivity extends AppCompatActivity
             holder.getImageView().setImageBitmap(roomFace.getBitmap());
             holder.getNameView().setText(roomFace.getRoomFace());
 
+            /* Selecting a room face image */
             holder.getImageView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Convert to byte array
-                    //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    //roomFace.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
                     Intent intent = new Intent(MainRoomActivity.this, PinsActivity.class);
                     intent.putExtra("roomFaceName",roomFace.getRoomFace());
-                    intent.putExtra("image",roomFace.getImage());
-                    intent.putExtra("action", getIntent().getExtras().getString("action"));
-                    startActivity(intent);
+
+                    if (receivedIntent != null){
+                        //If intent came from the Add Item Activity
+                        if (receivedIntent.hasExtra("AddItemRequest")) {
+                            Log.d(TAG, "IN MAIN ROOM -- GOING TO PINS ACTIVITY");
+                            intent.putExtra("AddItemRequest", (int)receivedIntent.getExtras().get("AddItemRequest"));
+                            startActivityForResult(intent, (int) receivedIntent.getExtras().get("AddItemRequest"));
+
+                        } else {
+                           //if it came from another activity like the all Rooms activity
+                            startActivity(intent);
+                        }
+
+                    }
+
                 }
             });
 
+            /* Setting up deletion of room faces in this room */
             holder.getImageView().setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -201,6 +215,18 @@ public class MainRoomActivity extends AppCompatActivity
         }
     }
 
+    /* Retrieving result from activity called -- this should only be for add item activity */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == (int)receivedIntent.getExtras().get("AddItemRequest")) {
+            Log.d(TAG, "RECEIVED ADD ITEM INTENT FROM PINS ACTIVITY");
+            if (resultCode == RESULT_OK) {
+                setResult(RESULT_OK, data);
+                finish();
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -244,7 +270,8 @@ public class MainRoomActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_all_rooms) {
-            //TODO do nothing?
+            intent = new Intent(this, AllRoomsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_all_items) {
             intent = new Intent(this, AllItemsActivity.class);
             intent.putExtra("activity","mainRoom");
