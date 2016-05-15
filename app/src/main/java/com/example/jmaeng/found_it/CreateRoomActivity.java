@@ -228,7 +228,7 @@ public class CreateRoomActivity extends AppCompatActivity
             for (int i = 0; i < mArrayUri.size(); i++ ) {
                 try {
                     Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), mArrayUri.get(i));
-
+                    bmp = scaleDownBitmap(bmp, 100, this); //TODO 100 works for hjeight but could possibly be smaller
                     byte[] byteArray = getBitmapAsByteArray(bmp);
 
                     if (i == 0) {
@@ -251,6 +251,25 @@ public class CreateRoomActivity extends AppCompatActivity
 
         }
         return true;
+    }
+
+    /**
+     * Shrink the bitmao
+     * @param photo - > bitmap to shrink
+     * @param newHeight - > new height
+     * @param context -> context
+     * @return -> smaller bitmap
+     */
+    public static Bitmap scaleDownBitmap(Bitmap photo, int newHeight, Context context) {
+
+        final float densityMultiplier = context.getResources().getDisplayMetrics().density;
+
+        int h= (int) (newHeight*densityMultiplier);
+        int w= (int) (h * photo.getWidth()/((double) photo.getHeight()));
+
+        photo=Bitmap.createScaledBitmap(photo, w, h, true);
+
+        return photo;
     }
 
     @Override
