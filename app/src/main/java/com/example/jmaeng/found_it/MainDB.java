@@ -558,6 +558,7 @@ public class MainDB {
         String query = "SELECT *" +
                 " FROM " + ITEMS_TABLE +
                 " WHERE " + ITEM_NAME + "=\'" + item_name + "\'";
+        Log.d(TAG, "Look for item: " + item_name);
         Cursor c = sqlDB.rawQuery(query, null);
         if(c == null || c.getCount() == 0) {
             closeDB();
@@ -582,8 +583,8 @@ public class MainDB {
                 c.getString(ITEM_CREATED_INDEX),      // 2/3/2016, 8:00 PM
                 c.getInt(ITEM_VIEW_CNT_INDEX),        // 10
                 c.getString(ITEM_LOCATION_INDEX),     // Office_2
-                c.getInt(ITEM_X_INDEX),               // 10
-                c.getInt(ITEM_Y_INDEX),               // 40
+                c.getFloat(ITEM_X_INDEX),               // 10
+                c.getFloat(ITEM_Y_INDEX),               // 40
                 c.getBlob(ITEM_IMG_INDEX));           // <image>
 
         c.close();

@@ -60,7 +60,7 @@ public class Item implements Serializable {
      * @param image The image of the item
      */
     public Item(String name, String desc, String access, String created, int view_cnt,
-                String location, int x, int y, byte[] image) {
+                String location, float x, float y, byte[] image) {
         this.ITEM_NAME = name;
         this.ITEM_DESC = desc;
         this.ITEM_ACCESS = access;
